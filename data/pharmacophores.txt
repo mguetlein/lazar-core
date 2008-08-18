@@ -1,0 +1,6 @@
+O=[C,N]									# H-bond acceptor
+[O,N;!H0;R0]							# H-bond donor
+[+,+2,+3]								# pos. charge
+[-,-2,-3]								# neg. charge
+[a]										# aromatic ring
+[C,F,Cl,Br,I,At]	# hydrophobic

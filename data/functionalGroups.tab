@@ -1,0 +1,142 @@
+1	[CX4]	Alkyl Carbon
+2	[$([CX2](=*)=*)]	Allenic Carbon
+3	[$([CX3]=[CX3])]	Vinylic Carbon(Ethenyl carbon)
+4	[$([CX2]#*)]	Acetylenic Carbon 
+5	c	Arene
+6	[CX3]=[OX1]	Carbonyl group
+7	[$([CX3]=[OX1]),$([CX3+]-[OX1-])]	Carbonyl group
+8	[CX3](=[OX1])C	Carbonyl with Carbon
+9	[OX1]=CN	Carbonyl with Nitrogen
+10	[CX3](=[OX1])O	Carbonyl with Oxygen
+11	[CX3H1](=O)[#6]	Aldehyde 
+12	[CX3](=[OX1])[OX2][CX3](=[OX1])	Anhydride 
+13	[NX3][CX3](=[OX1])[#6]	Amide 
+14	[NX3][CX3]=[NX3+]	Amidinium
+15	[N&X3,N&X4&+][CX3](=[OX1])[O&X2,O&X1&-]	Carbamate
+16	[N&X3][CX3](=[OX1])[OX2H0]	Carbamic ester
+17	[N&X3,N&X4&+][CX3](=[OX1])[O&X2&H,O&X1&-]	Carbamic acid.  
+18	[CX3](=O)[O-]	Carboxylate Ion 
+19	[CX3](=[OX1])(O)O	Carbonic Acid and/or Carbonic Ester
+20	[CX3](=[OX1])([OX2])[O&X2&H,O&X1&H0&-1]	Carbonic Acid or Carbonic Acid-Ester
+21	C[OX2][CX3](=[OX1])[OX2]C	Carbonic Ester(carbonic acid diester) 
+22	[CX3](=O)[OX2H1]	Carboxylic acid
+23	[CX3](=O)[O&X1&H0&-,O&X2&H1]	Carboxylic acid or conjugate base.
+24	[NX3][CX2]#[NX1]	Cyanamide 
+25	[#6][C&X3](=O)[O&X2&H0][#6]	Ester  
+26	[#6][C&X3](=O)[#6]	Ketone 
+27	[O&D2]([#6])[#6]	Ether
+28	[N&X3;H2,H1;!$(NC=O)]	Primary or secondary amine, not amide.
+29	[NX3][CX3]=[CX3]	Enamine  
+30	[NX3;H2;!$(NC=[!#6]);!$(NC#[!#6])][#6]	Primary amine, not amide.
+31	[N&X3;H2,H1;!$(NC=O)].[N&X3;H2,H1;!$(NC=O)]	Two primary or secondary amines
+32	[NX3][$(C=C),$(cc)]	Enamine or Aniline Nitrogen
+33	[N&X3,N&X4&+][CX4H]([*])[CX3](=[OX1])[O,N]	generic amino acid
+34	[N&X3&H2,N&H3&X4&+][CX4H]([*])[CX3](=[OX1])[N&X3,N&X4&+][CX4H]([*])[CX3](=[OX1])[O&X2&H,O&X1&-]	dipeptide group
+35	[$([N&X3&H2,N&X4&H3&+]),$([NX3H](C)(C))][CX4H]([*])[CX3](=[OX1])[O&X2&H,O&X1&-,N]	amino acid
+36	[CH3X4]	Alanine side chain
+37	[CH2X4][CH2X4][CH2X4][NHX3][CH0X3](=[N&H2&X3&+,N&H&X2&+0])[NH2X3]	Arginine side chain  
+38	[CH2X4][CX3](=[OX1])[NX3H2]	Aspargine side chain 
+39	[CH2X4][CX3](=[OX1])[O&H0&-,O&H]	Aspartate (or Aspartic acid) side chain
+40	[CH2X4][S&X2&H,S&X1&H0&-]	Cysteine side chain
+41	[CH2X4][CH2X4][CX3](=[OX1])[O&H0&-,O&H]	Glutamate (or Glutemic acid) side chain 
+42	[$([$([N&X3&H2,N&X4&H3&+]),$([NX3H](C)(C))][CX4H2][CX3](=[OX1])[O&X2&H,O&X1&-,N])]	Glycine
+43	[CH2X4][#6X3]1:[$([#7&X3&H&+,#7&X2&H0&+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]:[$([#7&X3&H&+,#7&X2&H0&+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]1	Histidine side chain
+44	[CHX4]([CH3X4])[CH2X4][CH3X4]	Isoleucine side chain
+45	[CH2X4][CHX4]([CH3X4])[CH3X4]	Leucine side chain
+46	[CH2X4][CH2X4][CH2X4][CH2X4][N&X4&+,N&X3&+0]	Lysine side chain
+47	[CH2X4][CH2X4][SX2][CH3X4]	Methionine side chain
+48	[CH2X4][cX3]1[cX3H][cX3H][cX3H][cX3H][cX3H]1	Phenylalanine side chain
+49	[$([N&X3&H,N&X4&H2&+]),$([NX3](C)(C)(C))]1[CX4H]([CH2][CH2][CH2]1)[CX3](=[OX1])[O&X2&H,O&X1&-,N]	Proline
+50	[CH2X4][OX2H]	Serine side chain
+51	[NX3][CX3]=[SX1]	Thioamide 
+52	[CHX4]([CH3X4])[OX2H]	Threonine side chain
+53	[CH2X4][cX3]1[cX3H][nX3H][cX3]2[cX3H][cX3H][cX3H][cX3H][cX3]12	Tryptophan side chain
+54	[CH2X4][cX3]1[cX3H][cX3H][cX3]([O&H&X2,O&H0&X1&-])[cX3H][cX3H]1	Tyrosine side chain  
+55	[CHX4]([CH3X4])[CH3X4]	Valine side chain
+56	[CH3X4]	Alanine side chain
+57	[CH2X4][CH2X4][CH2X4][NHX3][CH0X3](=[N&H2&X3&+,N&H&X2&+0])[NH2X3]	Arginine side chain  
+58	[CH2X4][CX3](=[OX1])[NX3H2]	Aspargine side chain 
+59	[CH2X4][CX3](=[OX1])[O&H0&-,O&H]	Aspartate (or Aspartic acid) side chain  
+60	[CH2X4][S&X2&H,S&X1&H0&-]	Cysteine side chain  
+61	[CH2X4][CH2X4][CX3](=[OX1])[O&H0&-,O&H]	Glutamate (or Glutemic acid) side chain 
+62	N[CX4H2][CX3](=[OX1])[O,N]	Glycine
+63	[CH2X4][#6X3]1:[$([#7&X3&H&+,#7&X2&H0&+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]:[$([#7&X3&H&+,#7&X2&H0&+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]1	Histidine side chain
+64	[CHX4]([CH3X4])[CH2X4][CH3X4]	Isoleucine side chain
+65	[CH2X4][CHX4]([CH3X4])[CH3X4]	Leucine side chain
+66	[CH2X4][CH2X4][CH2X4][CH2X4][N&X4&+,N&X3&+0]	Lysine side chain
+67	[CH2X4][CH2X4][SX2][CH3X4]	Methionine side chain
+68	[CH2X4][cX3]1[cX3H][cX3H][cX3H][cX3H][cX3H]1	Phenylalanine side chain
+69	N1[CX4H]([CH2][CH2][CH2]1)[CX3](=[OX1])[O,N]	Proline
+70	[CH2X4][OX2H]	Serine side chain
+71	[CHX4]([CH3X4])[OX2H]	Threonine side chain
+72	[CH2X4][cX3]1[cX3H][nX3H][cX3]2[cX3H][cX3H][cX3H][cX3H][cX3]12	Tryptophan side chain
+73	[CH2X4][cX3]1[cX3H][cX3H][cX3]([O&H&X2,O&H0&X1&-])[cX3H][cX3H]1	Tyrosine side chain
+74	[CHX4]([CH3X4])[CH3X4]	Valine side chain
+75	[$(*-[NX2-]-[NX2+]#[NX1]),$(*-[NX2]=[NX2+]=[NX1-])]	azide group
+76	[$([NX1-]=[NX2+]=[NX1-]),$([NX1]#[NX2+]-[NX1-2])]	azide ion 
+77	[#7]	Nitrogen
+78	[NX2]=N	Azo Nitrogen
+79	[NX2]=[NX2]	Azo Nitrogen. diazene
+80	[$([NX2]=[NX3+]([O-])[#6]),$([NX2]=[NX3+0](=[O])[#6])]	Azoxy Nitrogen
+81	[$([#6]=[N+]=[N-]),$([#6-]-[N+]#[N])]	Diazo Nitrogen
+82	[$([nr5]:[n&r5,o&r5,s&r5]),$([nr5]:[c&r5]:[n&r5,o&r5,s&r5])]	Azole
+83	[NX3][NX3]	Hydrazine H2NNH2
+84	[NX3][NX2]=[*]	Hydrazone C=NNH2
+85	[$([CX3]([#6])[#6]),$([CX3H][#6])]=[NX2][#6]	substituted imine 
+86	[$([CX3]([#6])[#6]),$([CX3H][#6])]=[$([NX2][#6]),$([NX2H])]	substituted or un-substituted imine
+87	[NX3+]=[CX3]	Iminium
+88	[CX3](=[OX1])[NX3H][CX3](=[OX1])	imide(unsubstituted dicarboximide, N analog of anhydride)   
+89	[CX3](=[OX1])[NX3H0]([#6])[CX3](=[OX1])	imide (substituted dicarboximide)   
+90	[CX3](=[OX1])[NX3H0]([NX3H0]([CX3](=[OX1]))[CX3](=[OX1]))[CX3](=[OX1])	imide (dicarboxdiimide) 
+91	[$([NX3](=[OX1])(=[OX1])O),$([NX3+]([OX1-])(=[OX1])O)]	Nitrate group 
+92	[$([OX1]=[NX3](=[OX1])[OX1-]),$([OX1]=[NX3+]([OX1-])[OX1-])]	Nitrate Anion
+93	[NX1]#[CX2]	nitrile
+94	[CX1-]#[NX2+]	Isonitrile
+95	[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8]	Nitro group. 
+97	[NX2]=[OX1]	Nitroso-group
+98	[$([#7+][OX1-]),$([#7v5]=[OX1]);!$([#7](~[O])~[O]);!$([#7]=[#7])]	N-Oxide  
+99	[OX2H]	Hydroxyl
+100	[#6][OX2H]	Hydroxyl in Alcohol (-ol)   
+101	[OX2H][CX3]=[OX1]	Hydroxyl in Carboxylic Acid
+102	[OX2H]P	Hydroxyl in H-O-P-
+103	[OX2H][#6X3]=[#6]	enol
+104	[OX2H][cX3]:[c]	pheno (Ar-OH)
+105	[OX2H][$(C=C),$(cc)]	Enol or Phenol
+106	[$([OH]-*=[!#6])]	Hydroxyl_acidic
+107	[O&X2,O&X1&-][O&X2,O&X1&-]	Peroxide groups 
+108	[$(P(=[OX1])([$([OX2H]),$([OX1-]),$([OX2]P)])([$([OX2H]),$([OX1-]),$([OX2]P)])[$([OX2H]),$([OX1-]),$([OX2]P)]),$([P+]([OX1-])([$([OX2H]),$([OX1-]),$([OX2]P)])([$([OX2H]),$([OX1-]),$([OX2]P)])[$([OX2H]),$([OX1-]),$([OX2]P)])]	phosphoric_acid groups
+109	[$(P(=[OX1])([OX2][#6])([$([OX2H]),$([OX1-]),$([OX2][#6])])[$([OX2H]),$([OX1-]),$([OX2][#6]),$([OX2]P)]),$([P+]([OX1-])([OX2][#6])([$([OX2H]),$([OX1-]),$([OX2][#6])])[$([OX2H]),$([OX1-]),$([OX2][#6]),$([OX2]P)])]	phosphoric_ester groups
+110	[#6X3](=[SX1])([!N])[!N]	Thio 
+111	[SX2]	Thiol, Sulfide or Disulfide Sulfur
+112	[#16X2H]	Thiol  
+113	[#16!H0]	Hydrogen attached to Sulfur
+114	[#16X2H0]	Sulfide 
+115	[#16X2H0][!#16]	mono-sulfide 
+116	[#16X2H0][#16X2H0]	di-sulfide 
+118	[$([#16X3](=[OX1])[OX2H0]),$([#16X3+]([OX1-])[OX2H0])]	Sulfinate   
+119	[$([#16X3](=[OX1])[O&X2&H,O&X1&H0&-]),$([#16X3+]([OX1-])[O&X2&H,O&X1&H0&-])]	Sulfinic Acid
+120	[$([#16X4](=[OX1])=[OX1]),$([#16X4+2]([OX1-])[OX1-])]	Sulfone  
+121	[$([#16X4](=[OX1])(=[OX1])([#6])[#6]),$([#16X4+2]([OX1-])([OX1-])([#6])[#6])]	Sulfone 
+122	[$([#16X4](=[OX1])(=[OX1])([#6])[O&X2&H,O&X1&H0&-]),$([#16X4+2]([OX1-])([OX1-])([#6])[O&X2&H,O&X1&H0&-])]	Sulfonic acid 
+123	[$([#16X4](=[OX1])(=[OX1])([#6])[OX2H0]),$([#16X4+2]([OX1-])([OX1-])([#6])[OX2H0])]	Sulfonate (sulfonic ester)
+124	[$([#16X3]=[OX1]),$([#16X3+][OX1-])]	Sulfoxide
+125	[$([#16X3](=[OX1])([#6])[#6]),$([#16X3+]([OX1-])([#6])[#6])]	Sulfoxide
+126	[$([SX4](=O)(=O)(O)O),$([SX4+2]([O-])([O-])(O)O)]	Sulfuric acid ester  
+127	[$([#16X4](=[OX1])(=[OX1])([O&X2&H,O&X1&H0&-])[OX2][#6]),$([#16X4+2]([OX1-])([OX1-])([O&X2&H,O&X1&H0&-])[OX2][#6])]	Sulfate (Sulfuric Acid monoester)  
+128	[$([#16X4](=[OX1])(=[OX1])([OX2][#6])[OX2][#6]),$([#16X4](=[OX1])(=[OX1])([OX2][#6])[OX2][#6])]	Sulfuric Acid Diester  
+129	[$([#16X4]([NX3])(=[OX1])(=[OX1])[OX2][#6]),$([#16X4+2]([NX3])([OX1-])([OX1-])[OX2][#6])]	Sulfamate
+130	[$([#16X4]([NX3])(=[OX1])(=[OX1])[O&X2&H,O&X1&H0&-]),$([#16X4+2]([NX3])([OX1-])([OX1-])[O&X2&H,O&X1&H0&-])]	Sulfamic Acid
+131	[$([#16X4]([NX3])(=[OX1])(=[OX1])[#6]),$([#16X4+2]([NX3])([OX1-])([OX1-])[#6])]	Sulfonamide
+132	[#16X2][O&X2&H,O&X1&H0&-]	sulfenic acid
+133	[#16X2][OX2H0]	sulfenate
+134	[$([#16X3]=[OX1]),$([#16X3+][OX1-])]	Sulfoxide
+135	[$([#16X3](=[OX1])([#6])[#6]),$([#16X3+]([OX1-])([#6])[#6])]	Sulfoxide 
+136	[NX3][CX3]=[SX1]	Thioamide   
+137	[$([SX4](=[OX1])(=[OX1])([!O])[NX3]),$([SX4+2]([OX1-])([OX1-])([!O])[NX3])]	Sulfonamide 
+138	[SX4](C)(C)(=O)=N	Partial N-Analog of Sulfone (Carbo-azosulfone)
+139	[S-][CX3](=S)[#6]	Carbo-Thiocarboxylate
+140	S([#6])[CX3](=O)[#6]	Carbo-Thioester
+141	[#6][F,Cl,Br,I]	any carbon attached to any halogen
+142	[F,Cl,Br,I]	Halogen
+143	[F,Cl,Br,I].[F,Cl,Br,I].[F,Cl,Br,I].[F,Cl,Br,I]	four_halides groups 
+144	[CX3](=[OX1])[F,Cl,Br,I]	Acyl Halide 

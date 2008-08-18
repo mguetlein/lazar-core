@@ -1,0 +1,13 @@
+lazar Documentation:
+
+Description of Concepts and Algorithms:
+
+API Documentation:
+
+- install doxygen (www.doxygen.org)
+- type make doc (or doxygen Doxyfile) in the lazar root directory
+- documentation is in ./html and ./latex
+
+Usage:
+
+- read INSTALL in the main directory

@@ -1,0 +1,79 @@
+# Edit according to your needs
+
+PROGRAM = lazar 
+FEAT_GEN = rex linfrag smarts-features sssr
+TOOLS = tabsmartsgrep chisq-filter 
+INSTALLDIR = /usr/local/bin
+
+
+OBJ = feature.o lazmol.o io.o 
+HEADERS = lazmolvect.h feature.h lazmol.h io.h ServerSocket.h Socket.h
+SERVER_OBJ = ServerSocket.o Socket.o
+OBJ += $(SERVER_OBJ)
+
+CC            = g++ --static 
+CXXFLAGS      = -g -O2 -I$(HOME)/src/openbabel-static/include/openbabel-2.0 
+LIBS	      =  -llazar -lopenbabel -lgslcblas -lgsl -lzzip -lz -lm -ldl 
+LDFLAGS       = -L$(HOME)/src/openbabel-static/lib/ -L. -Bstatic
+
+
+all: lazar-static
+
+install:  $(PROGRAM) $(FEAT_GEN) $(TOOLS) tools/*.pl tools/*.sh # sssr 
+	cp -f $? $(INSTALLDIR)/
+
+doc: $(OBJ) $(HEADERS) $(PROGRAM) $(FEAT_GEN) $(TOOLS) Doxyfile
+	doxygen Doxyfile
+
+##################################################################################
+
+lazar-static: $(OBJ) lazar.o liblazar.a
+	$(CC)  -o lazar-static $(CXXFLAGS) $(INCLUDE) $(LDFLAGS) $(LIBS) /home/ch/src/openbabel-2.0.1/src/formats/smilesformat.o
+
+liblazar.a: $(OBJ) lazar.o 
+	ar -cvq liblazar.a $(OBJ) lazar.o
+
+linfrag: $(OBJ) linfrag.o
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o linfrag $(OBJ) linfrag.o
+
+rex: $(OBJ) rex.o
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o rex $(OBJ) rex.o
+
+chisq-filter: $(OBJ)  chisq-filter.o 
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o chisq-filter $(OBJ)  chisq-filter.o 
+
+smarts-features: $(OBJ)  smarts-features.o 
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o smarts-features $(OBJ)  smarts-features.o 
+
+tabsmartsgrep: $(OBJ)  tabsmartsgrep.o 
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o tabsmartsgrep $(OBJ)  tabsmartsgrep.o 
+
+sssr: $(OBJ) sssr.o
+	$(CC) $(CXXFLAGS) $(INCLUDE) $(LIBS) $(LDFLAGS) -o sssr $(OBJ) sssr.o
+
+##################################################################################
+
+chisq-filter.o: $(HEADERS) activity-db.h feature-db.h 
+
+rex.o: $(HEADERS) feature-generation.h
+
+linfrag.o: $(HEADERS) feature-generation.h
+
+smarts-features.o: $(HEADERS) feature-generation.h
+
+sssr.o: $(HEADERS) feature-generation.h
+
+lazar.o: $(HEADERS) predictor.h activity-db.h feature-db.h feature-generation.h
+
+lazmol.o: lazmol.h 
+
+feature.o: feature.h 
+
+io.o: io.cpp io.h $(SERVER_OBJ)
+
+##################################################################################
+
+clean:
+	rm *.o $(PROGRAM) $(TOOLS) $(FEAT_GEN)
+
+##################################################################################

@@ -1,0 +1,13 @@
+O=N(~O)a	O=N(O)c[$(aS(=O)=O),$(aaS(=O)=O),$(aaaS(=O)=O),$(aC((F)F)F),$(aaC((F)F)),$(aaaC((F)F)F)]	# specific atom nitro
+a[NH2]	[NH2]a[$(a[$(C((F)F)F),$(S(=O)=O),$(C(=O)O)]),$(aa[$(C((F)F)F),$(S(=O)=O),$(C(=O)O)]),$(aaa[$(C((F)F)F),$(S(=O)=O),$(C(=O)O)])]	# specific atom amine
+a[N;X2]=O	# aromatic nitroso
+CO[N;X2]=O	# alkyl nitrite
+N[N;X2]=O	# nitrosamine
+O1[c,C][c,C]1	# epoxide (modified - single bond removed)
+C1NC1	#aziridine
+N=[N+]=[N-]	#azide
+C=[N+]=[N-]	#diazo
+N=N-N	#triazene
+c[N;X2]!@;=[N;X2]c	#aromatic azo
+cN!@;=[N;X3](O)c	#aromatic azoxy
+	

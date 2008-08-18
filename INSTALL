@@ -1,0 +1,23 @@
+============
+Installation
+============
+
+These are build instructions for Ubuntu, a Debian-based Linux distribution, release 7.04 (Feisty Fawn). For other distributions the process should differ only slightly.
+
+
+Preliminaries 
+=============
+
+bin-libs
+---------
+GNU Scientific Library (GSL) (issue as root):
+box:~$ aptitude install libgsl0-dev libgfortran1-dev build-essential
+
+
+Compilation
+===========
+
+svn checkout svn://www.in-silico.de/lazar/trunk (obviously you have already done this)
+cd trunk/ && make
+
+After successful compilation, you should have created (among others) the executable lazar in the current directory.
