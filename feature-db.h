@@ -43,6 +43,11 @@ class FeatMolVect: public MolVect<MolType,FeatureType,ActivityType> {
 	public:
 
 		FeatMolVect< MolType, FeatureType, ActivityType >(char * feat_file, char * structure_file, Out * out); 
+        ~FeatMolVect() {
+            for (unsigned int i=0; i<features.size(); i++) {
+                delete features[i];
+            }
+        }
 
 		//! read features from a file
 		void read_features(char * feat_file);

@@ -227,12 +227,12 @@ void FeatGen<MolType, FeatureType, ActivityType>::generate_pcprop(Out* out) {
 		OBMol* mol;
 		mol = (*structure_it)->get_mol_ref();
 		*out << mol->GetMolWt() << "\t";
-		OBLogP logP;
-		OBPSA psa;
-		OBMR mr;
-		*out << logP.Predict(*mol) << "\t";
-		*out << psa.Predict(*mol) << "\t";
-		*out << mr.Predict(*mol) << "\t" << endl;
+		OBDescriptor* pDesc = OBDescriptor::FindType("logP");
+		*out << pDesc->Predict(mol) << "\t";
+		pDesc = OBDescriptor::FindType("PSA");
+		*out << pDesc->Predict(mol) << "\t";
+		pDesc = OBDescriptor::FindType("MR");
+		*out << pDesc->Predict(mol) << endl;
 		out->print();
 	}
 

@@ -62,26 +62,32 @@ class Predictor {
 	public:
 
 		//! Predictor constructor for LOO
-		Predictor(char * structure_file, char * act_file, char * feat_file, Out * out): feat_gen(NULL), loo(false), out(out) {
+		Predictor(char * structure_file, char * act_file, char * feat_file, Out * out): feat_gen(NULL), train_structures(NULL), test_structures(NULL), model(NULL), loo(false), out(out) {
 			train_structures = new ActMolVect <MolType, FeatureType, ActivityType>(act_file, feat_file, structure_file, out);
             if (kernel) model = new KernelModel<MolType, FeatureType, ActivityType>(out);
             else model = new Model<MolType, FeatureType, ActivityType>(out);
 		{}};
 
 		//! Predictor constructor for single SMILES prediction
-		Predictor(char * structure_file, char * act_file, char * feat_file, char * alphabet_file, Out* out): feat_gen(NULL), a_file(alphabet_file), loo(false), out(out){
+		Predictor(char * structure_file, char * act_file, char * feat_file, char * alphabet_file, Out* out): feat_gen(NULL), train_structures(NULL), test_structures(NULL), model(NULL), a_file(alphabet_file), loo(false), out(out){
 			train_structures = new ActMolVect <MolType, FeatureType, ActivityType>(act_file, feat_file, structure_file, out);
             if (kernel) model = new KernelModel<MolType, FeatureType, ActivityType>(out);
             else model = new Model<MolType, FeatureType, ActivityType>(out);
 		}
 
 		//! Predictor constructor for batch prediction
-		Predictor(char * structure_file, char * act_file, char * feat_file, char * alphabet_file, char * input_file, Out* out): feat_gen(NULL), a_file(alphabet_file), loo(false), out(out){
+		Predictor(char * structure_file, char * act_file, char * feat_file, char * alphabet_file, char * input_file, Out* out): feat_gen(NULL), train_structures(NULL), test_structures(NULL), model(NULL), a_file(alphabet_file), loo(false), out(out){
 			train_structures = new ActMolVect <MolType, FeatureType, ActivityType>(act_file, feat_file, structure_file, out);
 			test_structures = new MolVect <MolType, FeatureType, ActivityType>(input_file, out);
             if (kernel) model = new KernelModel<MolType, FeatureType, ActivityType>(out);
             else model = new Model<MolType, FeatureType, ActivityType>(out);
 		}
+
+        ~Predictor() {
+            delete model;
+            delete train_structures;
+            delete test_structures;
+        }
 
 
 		//! predict a single smiles
@@ -342,6 +348,7 @@ void Predictor<MolType, FeatureType, ActivityType>::predict_smi(string smiles) {
 		}
 
 		delete cur_mol;
+        delete feat_gen;
 };
 
 template <class MolType, class FeatureType, class ActivityType>

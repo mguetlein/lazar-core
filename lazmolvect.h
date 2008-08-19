@@ -44,6 +44,10 @@ class MolVect {
 	public:
 
 		MolVect() {};
+        ~MolVect() {
+            for (unsigned int i=0; i<compounds.size(); i++)
+                delete compounds[i];
+        }
 
 		//! MolVect constructor: reads SMILES from file (called by FeatMolVect())
 		MolVect(char * structure_file, Out * out);

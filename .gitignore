@@ -1,0 +1,11 @@
+*~
+*.o
+chisq-filter
+lazar
+linfrag
+nohup.out
+pcprop
+rex
+smarts-features
+testset
+

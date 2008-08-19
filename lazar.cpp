@@ -145,33 +145,34 @@ int main(int argc, char *argv[], char *envp[]) {
 
 	// initialize R
 	cerr << "Initializing R environment...";
-	char* old_r_home = getenv("R_HOME");
+	//char* old_r_home = getenv("R_HOME");
 	
-	string r_home = "R_HOME=";
-	string r_libs = "/lib/R";
-	char* cwd = getenv("PWD");
-	if (cwd != NULL)     r_home = (r_home.append((const char*)cwd)).append(r_libs);
-	else                 r_home = r_home + '.' + r_libs;
-	putenv((char*) r_home.c_str());
+	//string r_home = "R_HOME=";
+	//string r_home = "R_HOME=../R";
+	//string r_libs = "/lib/R";
+	//char* cwd = getenv("PWD");
+	//if (cwd != NULL)     r_home = (r_home.append((const char*)cwd)).append(r_libs);
+	//else                 r_home = r_home + '.' + r_libs;
+	//putenv((char*) r_home.c_str());
 
 	char* R_argv[] = {"REmbeddedPostgres", "--gui=none", "--silent", "--no-save"};
 	int R_argc = sizeof(R_argv)/sizeof(R_argv[0]);
 
 
-	init_R(R_argc, R_argv);
-	R_exec("library", mkString("kernlab"));
+	//init_R(R_argc, R_argv);
+	//R_exec("library", mkString("kernlab"));
 	cerr << "done!" << endl;
 
 	// initialize OB
 	cerr << "Initializing OB environment...";
-	putenv("BABEL_LIBDIR=./lib/openbabel");
+	putenv("BABEL_LIBDIR=../openbabel/lib/");
 	cerr << "...done!" << endl;
 	
 	//print environment variables
-	// cerr << "Environment Variables: " << endl;
-	// for (int n=0; environ[n]; n++) cerr << environ[n]<<endl;
-	// cerr << endl;
-	// sleep(5);
+	cerr << "Environment Variables: " << endl;
+	for (int n=0; environ[n]; n++) cerr << environ[n]<<endl;
+	cerr << endl;
+	sleep(5);
 
 
 
@@ -285,7 +286,8 @@ int main(int argc, char *argv[], char *envp[]) {
 	
 	delete train_set_c;
 	delete train_set_r;
+    delete out;
 
-    if (old_r_home) putenv(old_r_home);
+    //if (old_r_home) putenv(old_r_home);
 	return (0);
 }
