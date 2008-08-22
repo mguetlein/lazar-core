@@ -159,20 +159,24 @@ int main(int argc, char *argv[], char *envp[]) {
 	int R_argc = sizeof(R_argv)/sizeof(R_argv[0]);
 
 
-	//init_R(R_argc, R_argv);
-	//R_exec("library", mkString("kernlab"));
+	init_R(R_argc, R_argv);
+	R_exec("library", mkString("kernlab"));
 	cerr << "done!" << endl;
 
 	// initialize OB
+	/*
 	cerr << "Initializing OB environment...";
 	putenv("BABEL_LIBDIR=../openbabel/lib/");
 	cerr << "...done!" << endl;
+	*/
 	
 	//print environment variables
+	/*
 	cerr << "Environment Variables: " << endl;
 	for (int n=0; environ[n]; n++) cerr << environ[n]<<endl;
 	cerr << endl;
 	sleep(5);
+	*/
 
 
 
