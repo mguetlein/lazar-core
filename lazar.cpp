@@ -145,14 +145,7 @@ int main(int argc, char *argv[], char *envp[]) {
 
 	// initialize R
 	cerr << "Initializing R environment...";
-	//char* old_r_home = getenv("R_HOME");
-	
-	//string r_home = "R_HOME=";
-	string r_home = "R_HOME=/home/ch/lazar-gui.git/vendor/R";
-	//string r_libs = "/lib/R";
-	//char* cwd = getenv("PWD");
-	//if (cwd != NULL)     r_home = (r_home.append((const char*)cwd)).append(r_libs);
-	//else                 r_home = r_home + '.' + r_libs;
+	string r_home = "R_HOME=../../R";
 	putenv((char*) r_home.c_str());
 
 	char* R_argv[] = {"REmbeddedPostgres", "--gui=none", "--silent", "--no-save"};
