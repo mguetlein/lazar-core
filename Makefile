@@ -12,10 +12,10 @@ SERVER_OBJ = ServerSocket.o Socket.o
 OBJ += $(SERVER_OBJ)
 
 CC            = g++
-CXXFLAGS      = -g -O2 -I../../include/openbabel-2.0/ -I../../lib/R/include/ -Wall
+CXXFLAGS      = -g -O2 -I/home/ch/lazar-gui.git/vendor/include/openbabel-2.0/ -I/home/ch/lazar-gui.git/vendor/R/include/ -Wall
 LIBS	      = -lm -ldl -lopenbabel -lgsl -lgslcblas -lR
-LDFLAGS       = -L../../lib 
-RPATH         = -Wl,-rpath=../../lib
+LDFLAGS       = -L/home/ch/lazar-gui.git/vendor/lib 
+RPATH         = -Wl,-rpath=../../R/lib
 
 .PHONY:
 all: $(PROGRAM) $(FEAT_GEN) $(TOOLS)
