@@ -216,17 +216,18 @@ int main(int argc, char *argv[], char *envp[]) {
 			exit(EXIT_SUCCESS);
 		sid = setsid();					// start child and store child id
 		if (sid < 0) exit(EXIT_FAILURE);
-		
+
 		if (!quantitative) train_set_c = new Predictor<OBLazMol,ClassFeat,bool>(smi_file, train_file, feature_file, alphabet_file, out);
 	    else train_set_r = new Predictor<OBLazMol,RegrFeat,float>(smi_file, train_file, feature_file, alphabet_file, out);
+	
 		string tmp;
 		signal(SIGTERM, shutdown); 
 		try	{									// start daemon
 			ServerSocket server( port );		// create the listening socket
-			while ( true ) {
+
+   			while ( true ) {
 				ServerSocket socket;			// conversational socket
 				server.accept ( socket );		// wait for a client connection
-				
                 out = new SocketOut(&socket);	// create a new output object
          
                 if (!quantitative) {
@@ -256,13 +257,12 @@ int main(int argc, char *argv[], char *envp[]) {
 						else train_set_r->predict_smi(smiles);		// predict
 						
 						server.remove ( socket ); // disconnect
-				delete out;
 					}
 				}
 				catch (...) {					// no client connection
 					cerr << "client removed.\n";
-				delete out;
 				}
+				delete out;
 			}
 		}
 		catch (...) {
@@ -275,7 +275,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	
 	delete train_set_c;
 	delete train_set_r;
-  delete out;
+    delete out;
 
 	return (0);
 }

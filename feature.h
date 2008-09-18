@@ -63,8 +63,10 @@ class ClassFeat: public Feat {
 		map<string, float> fa;
 		map<string, float> fi;
 		map<string, float> significance;
+        map<string, float> p;
 		map<string, bool> too_infrequent;
 		float cur_sig;
+		float cur_p;
 
 	public:
 		
@@ -79,10 +81,14 @@ class ClassFeat: public Feat {
 		void print_specifics(string act, Out* out);
 
 		void set_cur_significance(string act) { cur_sig = significance[act]; };
+		void set_cur_p(string act) { cur_p = p[act]; };
 
 		float get_significance(string act) { return (significance[act]); };
 		float get_cur_significance() { return (cur_sig); };
+		float get_cur_p() { return (cur_p); };
 		float get_sig_limit();
+		float get_p_limit();
+		float calc_p(string act);	
 		float get_p(string act);	//! returns the p value of the feature
 		float get_na(string act);
 		float get_ni(string act);
@@ -102,7 +108,9 @@ class RegrFeat: public Feat {
 		map<string, int> feature_smaller;
 		map<string, int> nr;
 		map<string, float> significance;
+        map<string, float> p;
 		float cur_sig;
+		float cur_p;
 		map<string, bool> too_infrequent;
 
 	public:
@@ -121,10 +129,14 @@ class RegrFeat: public Feat {
 
 		float get_significance(string act) { return(significance[act]); };	//! returns the p value of the feature
 		void set_cur_significance(string act) { cur_sig = significance[act]; };
+		void set_cur_p(string act) { cur_p = p[act]; };
 		float get_cur_significance() { return (cur_sig); };
-		float get_sig_limit();
+		float get_cur_p() { return (cur_p); };
+//		float get_sig_limit();
+		float get_p_limit();
 		float get_global_median(string act);
 		float get_median(string act);
+		float calc_p(string act);
 		float get_p(string act);	//! returns the p value of the feature
 		bool get_too_infrequent(string act) { return (too_infrequent[act]); };
 		void set_too_infrequent(string act) { too_infrequent[act] = true; };
@@ -288,13 +300,25 @@ bool Feature<FeatureType>::more_specific(FeatureType * f2) {
 template <class FeatureType>
 class greater_sig {
 
-	typedef Feature<FeatureType> * FeatRef;
+typedef Feature<FeatureType> * FeatRef;
 
-	public:
+public:
 
-		bool operator() (const FeatRef f1,const FeatRef f2) {
-				return (f1->get_cur_significance() > f2->get_cur_significance());
-		}
+    bool operator() (const FeatRef f1,const FeatRef f2) {
+            return (f1->get_cur_significance() > f2->get_cur_significance());
+    }
+};
+
+template <class FeatureType>
+class greater_p {
+
+typedef Feature<FeatureType> * FeatRef;
+
+public:
+
+    bool operator() (const FeatRef f1,const FeatRef f2) {
+            return (f1->get_cur_p() > f2->get_cur_p());
+    }
 };
 
 #endif // FEATURE_H

@@ -76,6 +76,7 @@ void ClassFeat::determine_significance(string act, float n_a, float n_i, vector<
 	na[act]=n_a;
 	ni[act]=n_i;
 	significance[act]=chisq;
+    p[act]=calc_p(act);
 	float cur_chisq = 0;
 	float cur_ea;
 	float cur_ei;
@@ -101,7 +102,7 @@ void ClassFeat::determine_significance(string act, float n_a, float n_i, vector<
 
 void ClassFeat::print(string act,Out * out) {
 
-	float p = this->get_p(act);
+	float p = this->p[act];
 	*out << "    - smarts: '" << this->get_name() << "'\n";
 	*out << "      p_chisq: '" << p << "'\n";
 	*out << "      chisq: '" << significance[act] << "'\n";
@@ -121,7 +122,11 @@ void ClassFeat::print(string act,Out * out) {
 
 float ClassFeat::get_sig_limit() { return(3.84); }; 
 
-float ClassFeat::get_p(string act) { return (gsl_cdf_chisq_P(significance[act], 1)); };
+float ClassFeat::get_p_limit() { return(0.95); }; 
+
+float ClassFeat::calc_p(string act) { return (gsl_cdf_chisq_P(significance[act], 1)); };
+
+float ClassFeat::get_p(string act) { return (p[act]); };
 
 float ClassFeat::get_na(string act) { return(na[act]); };
 
@@ -132,7 +137,7 @@ float ClassFeat::get_fa(string act) { return(fa[act]); };
 float ClassFeat::get_fi(string act) { return(fi[act]); };
 
 void ClassFeat::print_specifics(string act, Out* out) {
-		float p = this->get_p(act);
+		float p = this->p[act];
 		*out << this->get_name() << "\t" << p << "\t" << this->get_significance(act) << "\t" << (int) this->get_fa(act) << "\t" << (int) this->get_fi(act) << "\t" << (int) this->get_na(act) << "\t" << (int)this->get_ni(act) << "\t";
 		out->print();
 
@@ -154,8 +159,8 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 
 	// Kolmogorov-Smirnov Test
 	// numerical recipies in C pp 626, extended version with better sensitivity at the ends
-	unsigned int j1=0, j2=0,j;
-	float p,d,d1,d2,d_1,d_2,dt1,dt2,en1,en2,en,fn1=0,fn2=0,alam,a2,fac=2,sum=0,term,termbf=0,fac2;
+	unsigned int j1=0, j2=0;
+	float d,d1,d2,d_1,d_2,dt1,dt2,en1,en2,en,fn1=0,fn2=0,alam;
 	d1 = d2 = d_1 = d_2 = 0.0;
 
 	sort(feat_activities.begin(),feat_activities.end());
@@ -163,8 +168,6 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 
 	en1 = all_activities.size();
 	en2 = feat_activities.size();
-
-	
 
 	while (j1 < en1 && j2 < en2) {
 		if ((!isnan(d1=all_activities[j1])) && (!isnan(d2=feat_activities[j2]))) {
@@ -197,7 +200,8 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 	en=sqrt(en1*en2/(en1+en2));
 	alam=(en+0.155+0.24/en)*d;
 
-	// KS probability function
+	/*
+    // KS probability function
 	a2 = -2.0 *alam*alam;
 	p = 0;	// if probability function does not converge
 	fac2 = 4.0*alam*alam;
@@ -210,6 +214,7 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 		}
 		termbf=fabs(term);
 	}
+    */
 	
 	// compute and compare medians to determine activation property
 	float aasum, aamedian, aamean, aavar, aadev, aaskew, aakurt;
@@ -219,7 +224,8 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 
 	median[act]=famedian;
 	global_median[act]=aamedian;
-	significance[act]=p;
+	significance[act]=alam;
+    p[act]=calc_p(act);
 };
 
 
@@ -275,12 +281,13 @@ void RegrFeat::determine_significance(string act, float global_med, vector<float
 		sig = 0;
 	}
 	significance[act]=sig;
+    p[act]=calc_p(act);
 	median[act]=med;
 	global_median[act]=global_med;
 	feature_larger[act]=f_l;
 	feature_smaller[act]=f_s;
 	nr[act]=n;
-};
+    };
 
 
 void RegrFeat::print_header(Out * out) {
@@ -291,7 +298,7 @@ void RegrFeat::print_header(Out * out) {
 void RegrFeat::print(string act,Out * out) {
 
 		*out << "    - smarts: '" << this->get_name() << "'\n";
-		*out << "      p_ks: '" << this->get_p(act) << "'\n";
+		*out << "      p_ks: '" << this->p[act] << "'\n";
 		*out << "      property: '";
 		if (median[act]>global_median[act]) {
 			*out << "deactivating";
@@ -303,16 +310,38 @@ void RegrFeat::print(string act,Out * out) {
 		out->print();
 };
 
-float RegrFeat::get_sig_limit() { return(sig_thr); };
+//float RegrFeat::get_sig_limit() { return(sig_thr); };
+
+float RegrFeat::get_p_limit() { return(sig_thr); };
 
 float RegrFeat::get_global_median(string act) { return(global_median[act]); };
 
 float RegrFeat::get_median(string act) { return(median[act]); };
 
-float RegrFeat::get_p(string act) { return (significance[act]); };
+float RegrFeat::get_p(string act) { return(p[act]); };
+
+float RegrFeat::calc_p(string act) {
+
+	float p,a2,fac=2,sum=0,term,termbf=0,fac2;
+	// KS probability function
+	a2 = -2.0 *significance[act]*significance[act];
+	p = 0;	// if probability function does not converge
+	fac2 = 4.0*significance[act]*significance[act];
+	for (int j=1;j<=100;j++) {
+		term = fac*((fac2*j*j)-1.0)*exp(a2*j*j);
+		sum += term;
+		if (fabs(term) <= 0.001*termbf || fabs(term) <= 1.0e-8*sum) {
+			p=1-sum;
+			break;
+		}
+		termbf=fabs(term);
+	}
+    return (p); 
+
+};
 
 void RegrFeat::print_specifics(string act, Out* out) {
-		float p = this->get_p(act);
+		float p = this->p[act];
 		*out << this->get_name() << "\t" << p << "\t";
 		out->print();
 }

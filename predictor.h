@@ -347,8 +347,6 @@ void Predictor<MolType, FeatureType, ActivityType>::predict_smi(string smiles) {
 			}
 		}
 
-		delete cur_mol;
-        delete feat_gen;
 };
 
 template <class MolType, class FeatureType, class ActivityType>

@@ -221,7 +221,7 @@ void ActMolVect<MolType, FeatureType, ActivityType>::print_sig_features(float li
 		
 		for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
 
-			if ( (*cur_feat)->get_significance(*cur_act) > limit ) { 
+			if ( (*cur_feat)->get_p(*cur_act) > limit ) { 
 
 				if (find(printed_features.begin(),printed_features.end(),*cur_feat) == printed_features.end()) {
 					(*cur_feat)->print_matches(out, smarts);
@@ -248,7 +248,7 @@ void  ActMolVect<MolType, FeatureType, ActivityType>::print_sorted_features(floa
 
         for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
 
-            if ( (*cur_feat)->get_significance(*cur_act) > limit )
+            if ( (*cur_feat)->get_p(*cur_act) > limit )
 		(*cur_feat)->print_all(*cur_act, out, smarts);
 
         }

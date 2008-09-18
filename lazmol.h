@@ -907,14 +907,10 @@ void FeatMol<MolType,FeatureType,ActivityType>::print_features(string act) {
 		typename FeatVect::iterator cur_feat;
 		typename FeatVect::iterator cur_nonr;
 
-		sort(features.begin(),features.end(),greater_sig<FeatureType>());
+		sort(features.begin(),features.end(),greater_p<FeatureType>());
 
 		// determine nonredundant features
-		float sig_f_sum = 0;
 		for (cur_feat=features.begin();cur_feat!=features.end();cur_feat++) {
-
-			if ((*cur_feat)->get_significance(act) >= (*cur_feat)->get_sig_limit())
-				sig_f_sum = sig_f_sum + (*cur_feat)->get_p(act);
 
 			f1_matches = (*cur_feat)->get_matches_ptr() ;
 			redundant = false;
@@ -937,7 +933,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::print_features(string act) {
 
 			if (!redundant) {
 				nonred.push_back(*cur_feat);
-				if ((*cur_feat)->get_significance(act) >= (*cur_feat)->get_sig_limit()) {
+				if ((*cur_feat)->get_p(act) >= (*cur_feat)->get_p_limit()) {
 					(*cur_feat)->print(act,out);
 				}
 			}
@@ -1020,13 +1016,13 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 	
 	// set significances in union feature set
 	for (cur_feat = uv.begin(); cur_feat != uv.end(); cur_feat++) {
-		(*cur_feat)->set_cur_significance(act); 	
+		(*cur_feat)->set_cur_p(act); 	
 	}
 
 	// determine u = sum of significances of union feature set
 	for (cur_feat = uv.begin(); cur_feat != uv.end(); cur_feat++) {
-		p = (*cur_feat)->get_cur_significance();
-		if (p >= (*cur_feat)->get_sig_limit()) { // (*)
+		p = (*cur_feat)->get_cur_p();
+		if (p >= (*cur_feat)->get_p_limit()) { // (*)
 			p = gauss(p);
 			suni.push_back(*cur_feat);
 			u = u + p;
@@ -1036,17 +1032,17 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 	tanimoto = 0.0;
 	if (suni.size() > 1) {
 		// intersect significance endowed features with common features
-		sort(suni.begin(),suni.end(),greater_sig<FeatureType>());
-		sort(iv.begin(),iv.end(),greater_sig<FeatureType>());
+		sort(suni.begin(),suni.end(),greater_p<FeatureType>());
+		sort(iv.begin(),iv.end(),greater_p<FeatureType>());
 		set_intersection(iv.begin(),iv.end(),
 				suni.begin(),suni.end(),
 				insert_iterator<FeatVect >(sinter,sinter.begin()),
-				greater_sig<FeatureType>());
+				greater_p<FeatureType>());
 	
 		// determine c = sum of significances of common feature set
 		for (cur_feat = sinter.begin(); cur_feat != sinter.end(); cur_feat++) {
-			p = (*cur_feat)->get_cur_significance();
-			if (p >= (*cur_feat)->get_sig_limit()) { // test is needed if (*) is not applied to suni.push_back()
+		    p = (*cur_feat)->get_cur_p();
+			if (p >= (*cur_feat)->get_p_limit()) { // test is needed if (*) is not applied to suni.push_back()
 				p = gauss(p);
 				c = c + p;
 			}

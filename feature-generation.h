@@ -216,6 +216,7 @@ void FeatGen<MolType, FeatureType, ActivityType>::generate_testset(int p, int po
 
 
 //! Prints physicochemical properties in the form id \t molweight \t logP \t psa \t mr
+/* FIX for OpenBabel 2.2
 template <class MolType, class FeatureType, class ActivityType>
 void FeatGen<MolType, FeatureType, ActivityType>::generate_pcprop(Out* out) {
 
@@ -227,16 +228,17 @@ void FeatGen<MolType, FeatureType, ActivityType>::generate_pcprop(Out* out) {
 		OBMol* mol;
 		mol = (*structure_it)->get_mol_ref();
 		*out << mol->GetMolWt() << "\t";
-		OBDescriptor* pDesc = OBDescriptor::FindType("logP");
-		*out << pDesc->Predict(mol) << "\t";
-		pDesc = OBDescriptor::FindType("PSA");
-		*out << pDesc->Predict(mol) << "\t";
-		pDesc = OBDescriptor::FindType("MR");
-		*out << pDesc->Predict(mol) << endl;
+		OBLogP logP;
+		OBPSA psa;
+		OBMR mr;
+		*out << logP.Predict(*mol) << "\t";
+		*out << psa.Predict(*mol) << "\t";
+		*out << mr.Predict(*mol) << "\t" << endl;
 		out->print();
 	}
 
 };
+*/
 
 
 template <class MolType, class FeatureType, class ActivityType>

@@ -59,7 +59,7 @@ OBLazMol::OBLazMol(int nr, string new_descr, string new_smiles, Out * out):
 
 		string tmp_inchi;
 		OBConversion conv(&cin,&cout);
-		conv.SetInAndOutFormats("smi","inchi");
+		conv.SetInAndOutFormats("SMI","INCHI");
 		if (!conv.ReadString(&mol,new_smiles)) {
 			*out << "\nError reading molecule nr. " << nr <<  endl;
 			out->print_err();

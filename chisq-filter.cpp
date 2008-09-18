@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	char * smi_file = NULL;
 	char * feature_file = NULL;
 	char * smarts = NULL;
-	float limit = 0;
+	float limit = sig_thr;
 
 	while ((c = getopt(argc, argv, "s:t:f:l:m:n")) != -1) {
 		switch(c) {
