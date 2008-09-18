@@ -156,23 +156,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	R_exec("library", mkString("kernlab"));
 	cerr << "done!" << endl;
 
-	// initialize OB
-	/*
-	cerr << "Initializing OB environment...";
-	putenv("BABEL_LIBDIR=../openbabel/lib/");
-	cerr << "...done!" << endl;
-	*/
-	
-	//print environment variables
-	/*
-	cerr << "Environment Variables: " << endl;
-	for (int n=0; environ[n]; n++) cerr << environ[n]<<endl;
-	cerr << endl;
-	sleep(5);
-	*/
-
-
-
 	// start predictions
 	if (!daemon) {						// keep writing to STDOUT/STDERR
 
@@ -234,6 +217,8 @@ int main(int argc, char *argv[], char *envp[]) {
 		sid = setsid();					// start child and store child id
 		if (sid < 0) exit(EXIT_FAILURE);
 		
+		if (!quantitative) train_set_c = new Predictor<OBLazMol,ClassFeat,bool>(smi_file, train_file, feature_file, alphabet_file, out);
+	    else train_set_r = new Predictor<OBLazMol,RegrFeat,float>(smi_file, train_file, feature_file, alphabet_file, out);
 		string tmp;
 		signal(SIGTERM, shutdown); 
 		try	{									// start daemon
@@ -243,8 +228,14 @@ int main(int argc, char *argv[], char *envp[]) {
 				server.accept ( socket );		// wait for a client connection
 				
                 out = new SocketOut(&socket);	// create a new output object
-	    		if (!quantitative) train_set_c = new Predictor<OBLazMol,ClassFeat,bool>(smi_file, train_file, feature_file, alphabet_file, out);
-		        else train_set_r = new Predictor<OBLazMol,RegrFeat,float>(smi_file, train_file, feature_file, alphabet_file, out);
+         
+                if (!quantitative) {
+                    train_set_c->set_output(out);       // set new output
+                }
+                else {
+                    train_set_r->set_output(out);       // set new output
+                }
+
 
 				cerr << "client accepted\n";
 				try {
@@ -265,12 +256,13 @@ int main(int argc, char *argv[], char *envp[]) {
 						else train_set_r->predict_smi(smiles);		// predict
 						
 						server.remove ( socket ); // disconnect
+				delete out;
 					}
 				}
 				catch (...) {					// no client connection
 					cerr << "client removed.\n";
-				}
 				delete out;
+				}
 			}
 		}
 		catch (...) {
@@ -283,8 +275,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	
 	delete train_set_c;
 	delete train_set_r;
-    delete out;
+  delete out;
 
-    //if (old_r_home) putenv(old_r_home);
 	return (0);
 }
