@@ -46,8 +46,8 @@ class Predictor {
 		ActMolVect <MolType, FeatureType, ActivityType> * train_structures;
 		//! test structures for batch predictions
 		MolVect <MolType, FeatureType, ActivityType> * test_structures;
-        //! model
-        MetaModel<MolType, FeatureType, ActivityType>* model;
+		//! model
+		MetaModel<MolType, FeatureType, ActivityType>* model;
         
 
 		//! neighbors for the prediction of the current query structure
@@ -455,6 +455,7 @@ void Predictor<MolType, FeatureType, ActivityType>::set_output(Out * newout) {
 	
 	out = newout;
 	int train_size = train_structures->get_size();
+	model->set_output(out);
 
 	for (int n = 0; n < train_size; n++) {
 		train_structures->get_compound(n)->set_output(out);

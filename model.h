@@ -53,8 +53,13 @@ class MetaModel {
 	typedef vector<FeatMol < MolType, ClassFeat, bool > * > ClassMolVect; 
 	typedef vector<FeatMol < MolType, RegrFeat, float > * > RegrMolVect; 
 	typedef vector<FeatMol<MolType,FeatureType,ActivityType>*> MolVect; 
-        
+
+		public:
+				Out* out;
+
     public:
+        //MetaModel(Out* out): out(out) {};
+				void set_output(Out * newout) { out = newout; };
         virtual ~MetaModel() {};
         virtual void calculate_prediction(FeatMol < MolType, ClassFeat, bool >* test, ClassMolVect * neighbors, string act){};
         virtual void calculate_prediction(FeatMol < MolType, RegrFeat, float >* test, RegrMolVect * neighbors, string act){};
@@ -70,10 +75,9 @@ class Model: public MetaModel<MolType,FeatureType,ActivityType> {
 
     private:
         vector<string> unknown_features;
-        Out* out;
 
     public:
-        Model(Out* out): out(out) {};
+        Model(Out* out) { this->set_output(out); };
         virtual ~Model() {};
         virtual void calculate_prediction(FeatMol<MolType,ClassFeat,bool>* t, ClassMolVect* neighbors, string act);
         virtual void calculate_prediction(FeatMol<MolType,RegrFeat,float>* test, RegrMolVect* neighbors, string act);
@@ -91,16 +95,14 @@ class KernelModel: public MetaModel<MolType,FeatureType,ActivityType> {
     private:
         vector<string> unknown_features;
         ActivityType prediction;
-        Out* out;
+        //Out* out;
 
     public:
-        KernelModel(Out* out): out(out){};
+        KernelModel(Out* out) { this->set_output(out); };
         virtual ~KernelModel() {};
         virtual void calculate_prediction(FeatMol<MolType,ClassFeat,bool>* t, ClassMolVect * neighbors, string act);
         virtual void calculate_prediction(FeatMol<MolType,RegrFeat,float>* test, RegrMolVect * neighbors, string act);
 };
-
-
 
 // Implementations
 template <typename MolType, typename FeatureType, typename ActivityType>
@@ -140,14 +142,14 @@ void Model<MolType,FeatureType,ActivityType>::calculate_prediction(FeatMol<MolTy
 		this->out->print();
 
 		if (prediction>0) {
-			*out << "prediction: 1\n";
-			*out << "confidence: " << prediction << "\n";
-			out->print();
+			*(this->out) << "prediction: 1\n";
+			*(this->out) << "confidence: " << prediction << "\n";
+			this->out->print();
 		}
 		else {
-			*out << "prediction: 0\n";
-			*out << "confidence: " << prediction << "\n";
-			out->print();
+			*(this->out) << "prediction: 0\n";
+			*(this->out) << "confidence: " << prediction << "\n";
+			this->out->print();
 		}
 	}
 
