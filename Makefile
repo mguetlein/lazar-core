@@ -3,7 +3,7 @@ SHELL=/bin/bash
 
 PROGRAM = lazar 
 FEAT_GEN = rex linfrag smarts-features testset
-TOOLS = chisq-filter pcprop
+TOOLS = chisq-filter #pcprop
 INSTALLDIR = /usr/local/bin
 
 OBJ = feature.o lazmol.o io.o utils.o rutils.o
