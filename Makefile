@@ -14,7 +14,7 @@ OBJ += $(SERVER_OBJ)
 CC            = g++
 CXXFLAGS      = -g -O2 -I../../include/openbabel-2.0/ -I../../R/include/ -Wall
 LIBS	      = -lm -ldl -lopenbabel -lgsl -lgslcblas -lR
-LDFLAGS       = -L../../lib 
+LDFLAGS       = -L../../lib -L../../R/lib
 RPATH         = -Wl,-rpath=../../R/lib:../../lib
 
 .PHONY:
