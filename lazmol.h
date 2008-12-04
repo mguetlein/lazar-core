@@ -1,4 +1,4 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class LazMol {
 		int get_line_nr();
 		string get_id();
 		string get_inchi();		//!< return InChI string
-		
+
 		void print(); //!< print id and line number
 		string get_smiles();	//!< return SMILES string
 		void set_output(Out * newout);
@@ -102,9 +102,9 @@ class FeatMol: public MolType {
 
 	typedef vector<Feature<FeatureType> *> FeatVect;
 	typedef FeatMol<MolType,FeatureType,ActivityType> * MolRef;
-	typedef vector<FeatMol < MolType, ClassFeat, bool > * > ClassMolVect; 
-	typedef vector<FeatMol < MolType, RegrFeat, float > * > RegrMolVect; 
-	typedef vector<FeatMol<MolType,FeatureType,ActivityType>*> MolVect; 
+	typedef vector<FeatMol < MolType, ClassFeat, bool > * > ClassMolVect;
+	typedef vector<FeatMol < MolType, RegrFeat, float > * > RegrMolVect;
+	typedef vector<FeatMol<MolType,FeatureType,ActivityType>*> MolVect;
 
 	private:
 
@@ -121,9 +121,9 @@ class FeatMol: public MolType {
 		map<string, vector<ActivityType> > db_activities;
 		map<string, bool > available;
 		map<string, bool > available_bak;
-	
+
 		//! tanimoto distance
-		float similarity; 
+		float similarity;
 
 		ActivityType prediction;
 
@@ -188,17 +188,17 @@ class FeatMol: public MolType {
 
 		map<string, vector<ActivityType> > get_activities() { return activities; };
 		map<string, vector<ActivityType> > get_db_activities() { return db_activities; };
-		
+
 		void set_db_activities(map<string, vector<ActivityType> > new_act);
-		
+
 		void replace_db_activities(map<string, vector<ActivityType> > new_act);
-		
+
 		void replace_activities(map<string, vector<ActivityType> > new_act);
 
 		void set_available(map<string, bool> new_avail);
 
 		void clear_act() { activities.clear(); }
-		
+
 		void print_neighbor(string act);
 
 		vector<string> get_unknown() { return(unknown_features); };
@@ -208,7 +208,7 @@ class FeatMol: public MolType {
 		void print_unknown(string act);
 
 		FeatVect get_features() { return(features); };
-		
+
 		void print_features(string act);
 
 		void add_feature(Feature<FeatureType> * feat);
@@ -216,7 +216,7 @@ class FeatMol: public MolType {
 		void clear_features() { features.clear(); };
 
 		void common_features(MolRef test);
-		
+
 		void common_features(MolRef m1, MolRef m2, FeatVect* inter, FeatVect* uni);
 
 		void relevant_features(MolRef test, string act);
@@ -333,15 +333,15 @@ void FeatMol<MolType,FeatureType,ActivityType>::run_pca(gsl_matrix** X_p, gsl_ve
 
 	(*X_p) = X_transform;
 
-	// detach x_p from X_p 
+	// detach x_p from X_p
 	X_new = gsl_matrix_calloc((((*X_p)->size1)-1), (*X_p)->size2);
 	mv = gsl_matrix_submatrix((*X_p),0,0,X_new->size1,X_new->size2);
 	gsl_matrix_memcpy(X_new, &mv.matrix);
-	
+
 	gsl_vector* x_new = gsl_vector_calloc((*X_p)->size2);
 	gsl_vector_view vv = gsl_matrix_row((*X_p),(((*X_p)->size1)-1));
 	gsl_vector_memcpy(x_new,&vv.vector);
-	
+
 	gsl_matrix_free(*X_p);
 	(*X_p) = X_new;
 	gsl_vector_free(*x_p);
@@ -393,7 +393,7 @@ template <typename MolType, typename FeatureType, typename ActivityType>
 bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* lrf, RegrMolVect* n, unsigned int no_c, gsl_matrix** X_p, gsl_vector** x_p, string act, float* qdist, float* med_ndist, float* std_ndist, float* max_ndist) {
 
 	#define	FEATURE_POOL_SIZE 100000
-	
+
 	typename FeatVect::iterator cur_feat;
 	bool tset_interpolates = true;
 
@@ -422,7 +422,7 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 	// insert features
 	gsl_vector* fv;
 	if (no_c) {
-		
+
 		fv = gsl_vector_calloc(n->size());
 		if (fv->size != (*X_p)->size1) { cerr << "ofs: feature vector with wrong size!" << endl; exit(1); }
 
@@ -437,13 +437,13 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 		do {
 			if ((f_it == lrf->end()) || (f_cnt == FEATURE_POOL_SIZE)) break;
 			build_fv(&q, fv, n, (*f_it));
-			insert = true; 
-			if (gsl_vector_isnull(fv)) {  
+			insert = true;
+			if (gsl_vector_isnull(fv)) {
 				insert=false; }
-			if (singular(fv)) { 
+			if (singular(fv)) {
 				insert=false; }
-			f_it++; 
-			f_cnt++; 
+			f_it++;
+			f_cnt++;
 
 		} while (!insert);
 
@@ -466,18 +466,18 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 				bool extend = true;
 				for (unsigned int i=0; i<(*X_p)->size2; i++) {
 					gsl_vector_view vv = gsl_matrix_column((*X_p),i);
-					if (equal(fv, &vv.vector)) { extend=false; //cerr << "e" << i << "(" << (*X_p)->size2 << ")"; 
+					if (equal(fv, &vv.vector)) { extend=false; //cerr << "e" << i << "(" << (*X_p)->size2 << ")";
 						break; }
 				}
-				if (gsl_vector_isnull(fv)) { extend = false; //cerr << "n" << "(" << (*X_p)->size2 << ")"; 
+				if (gsl_vector_isnull(fv)) { extend = false; //cerr << "n" << "(" << (*X_p)->size2 << ")";
 					}
-				if (singular(fv)) { extend = false; //cerr << "s" << "(" << (*X_p)->size2 << ")"; 
+				if (singular(fv)) { extend = false; //cerr << "s" << "(" << (*X_p)->size2 << ")";
 					}
-				if (extend) { extend_matrix(X_p, fv); extend_vector(x_p, q); //cerr << (*x_p)->size; 
+				if (extend) { extend_matrix(X_p, fv); extend_vector(x_p, q); //cerr << (*x_p)->size;
 					}
-				
+
 				f_it++; //cerr << "-";
-				f_cnt++; 
+				f_cnt++;
 
 			} while ((*x_p)->size < no_c);
 
@@ -495,42 +495,42 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 
 
 		// check if query structure is an outlier using leverage
-		if ((*X_p)->size1 > 1) { 
+		if ((*X_p)->size1 > 1) {
 			list<float> ds;
 			list<float>* ndists = &ds;
 
 			// calculate mahalanobis distances for neigbors and query structure and mean neighbor distance
 			run_mahal(X_p, x_p, qdist, ndists);
 
-			list<float>::iterator d_it; 
+			list<float>::iterator d_it;
 			float dsum, dmedian, dmean, dvar, ddev, dskew, dkurt;
 			ndists->sort();
 			if (ndists->size() > 3) { ndists->pop_back(); ndists->pop_front(); }
 			computeStats(ndists->begin(), ndists->end(), dsum, dmedian, dmean, dvar, ddev, dskew, dkurt);
 
-						
+
 			// compute maximum of mahal distances
 			float dmax = 0.0;
 			d_it = ndists->end(); if (d_it != ndists->begin()) { d_it--; dmax = (*d_it); }
-			
+
 			// store return values
 			(*med_ndist) = dmedian;
 			(*std_ndist) = ddev;
 			(*max_ndist) = dmax;
 
-		
+
 			// leverage normalizer from: C05, p. 124
 			float normalizer = 0.0;
 			for (d_it = ndists->begin(); d_it != ndists->end(); d_it++) {
 				normalizer = normalizer + ((*d_it)*(*d_it));
 			}
-			
+
 			// leverage threshold from: C05, p. 124
 			float outlier_threshold = 2.0 * ((*X_p)->size2+1) / ((*X_p)->size1);
 
 			// leverage value for query structure : 1/n + qd²/d²
 			(*qdist) = ((*qdist)*(*qdist)) / normalizer;
-			(*qdist) = (*qdist) + (1.0 / ndists->size());	
+			(*qdist) = (*qdist) + (1.0 / ndists->size());
 			if ((*qdist) > outlier_threshold) tset_interpolates = false;
 
 			// neighbor outlier check
@@ -541,15 +541,15 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 					if (current_n_dist > outlier_threshold) cerr << "OUTLIER!!" << endl;
 				}
 			}
-			
+
 		}
-		
- 
+
+
 
 
 		// insert last column (y-intercept)
 		gsl_vector_set_all (fv, 1.0);
-		extend_matrix(X_p, fv); extend_vector(x_p, 1.0); 
+		extend_matrix(X_p, fv); extend_vector(x_p, 1.0);
 		gsl_vector_free(fv);
 
 
@@ -563,9 +563,9 @@ bool FeatMol<MolType,FeatureType,ActivityType>::build_descriptors_pca(FeatVect* 
 		gsl_vector_set((*x_p), 0, 1.0);
 		gsl_vector_free(fv);
 
-	}	
+	}
 
-	
+
 	return tset_interpolates;
 
 }
@@ -587,8 +587,8 @@ float FeatMol<MolType,FeatureType,ActivityType>::gauss(float sim, float sigma = 
 
 
 template <typename MolType, typename FeatureType, typename ActivityType>
-float FeatMol<MolType,FeatureType,ActivityType>::calculate_confidence(MolVect* n, string act) {	
-	
+float FeatMol<MolType,FeatureType,ActivityType>::calculate_confidence(MolVect* n, string act) {
+
 	vector<float> sims;
 	vector<float> acts;
 	vector<float> activity;
@@ -603,11 +603,11 @@ float FeatMol<MolType,FeatureType,ActivityType>::calculate_confidence(MolVect* n
 	if (cur_n != n->begin()) {
 		do {
 			cur_n--;
-			
+
 			sim = (*cur_n)->get_similarity();
 			sim = gauss(sim);
 			sims.push_back(sim);
-			
+
 			activity = (*cur_n)->get_act(act);
 			sort(activity.begin(), activity.end());
 			computeStats(activity.begin(), activity.end(), asum, amedian, amean, avar, adev, askew, akurt);
@@ -615,12 +615,12 @@ float FeatMol<MolType,FeatureType,ActivityType>::calculate_confidence(MolVect* n
 
 		} while (cur_n != n->begin());
 	}
-	
+
 	sort(sims.begin(), sims.end());
 	computeStats(sims.begin(), sims.end(), ssum, smedian, smean, svar, sdev, sskew, skurt);
 	sort(acts.begin(), acts.end());
 	computeStats(acts.begin(), acts.end(), asum, amedian, amean, avar, adev, askew, akurt);
-	
+
 	float act_disc = exp(-adev);
 	confidence = smedian * act_disc;
 	return(confidence);
@@ -628,7 +628,7 @@ float FeatMol<MolType,FeatureType,ActivityType>::calculate_confidence(MolVect* n
 }
 
 template <typename MolType, typename FeatureType, typename ActivityType>
-void FeatMol<MolType,FeatureType,ActivityType>::unite_features(vector<Feature<FeatureType> *>* lr_features, RegrMolVect * neighbors) {	
+void FeatMol<MolType,FeatureType,ActivityType>::unite_features(vector<Feature<FeatureType> *>* lr_features, RegrMolVect * neighbors) {
 
 	typename RegrMolVect::iterator cur_n;
 	FeatVect tmp_features;
@@ -669,7 +669,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::set_y(FeatMol<MolType,RegrFeat,f
 
 	vector<float> activity;
 	float asum, amedian, amean, avar, adev, askew, akurt;
-	
+
 	activity = cur_n->get_act(act);
 	amedian = 0;
 	sort(activity.begin(), activity.end());
@@ -684,9 +684,9 @@ void FeatMol<MolType,FeatureType,ActivityType>::set_y_w(FeatMol<MolType,RegrFeat
 	float sim = 0.0;
 	vector<float> activity;
 	float asum, amedian, amean, avar, adev, askew, akurt;
-	
+
 	sim = cur_n->get_similarity();
-	sim = gauss(sim); 
+	sim = gauss(sim);
 	gsl_vector_set(w, (rc-1), sim);
 
 	activity = cur_n->get_act(act);
@@ -699,7 +699,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::set_y_w(FeatMol<MolType,RegrFeat
 
 
 template <typename MolType, typename FeatureType, typename ActivityType>
-void FeatMol<MolType,FeatureType,ActivityType>::calculate_gram_matrix(MolVect * neighbors, gsl_matrix* gram_matrix, string act) {	
+void FeatMol<MolType,FeatureType,ActivityType>::calculate_gram_matrix(MolVect * neighbors, gsl_matrix* gram_matrix, string act) {
 	typename MolVect::iterator cur_n, cur_n2;
 
 	// calculate upper right
@@ -718,8 +718,8 @@ void FeatMol<MolType,FeatureType,ActivityType>::calculate_gram_matrix(MolVect * 
 	gsl_matrix* ll = gsl_matrix_calloc(neighbors->size(), neighbors->size());
 	gsl_matrix_transpose_memcpy (ll,gram_matrix);
 	gsl_matrix_add(gram_matrix, ll);
-	
-	// diagonal has been set twice	
+
+	// diagonal has been set twice
 	for (unsigned int i = 0; i<neighbors->size(); i++) {
 		gsl_matrix_set(gram_matrix,i,i,(gsl_matrix_get(gram_matrix,i,i)/2.0));
 	}
@@ -732,7 +732,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::calculate_gram_matrix(MolVect * 
 
 
 template <typename MolType, typename FeatureType, typename ActivityType>
-void FeatMol<MolType,FeatureType,ActivityType>::calculate_pred_matrix(MolVect * neighbors, gsl_matrix* pred_matrix, SEXP svR) {	
+void FeatMol<MolType,FeatureType,ActivityType>::calculate_pred_matrix(MolVect * neighbors, gsl_matrix* pred_matrix, SEXP svR) {
 	typename MolVect::iterator cur_n;
 	unsigned int i=0;
 	unsigned int j=0;
@@ -742,7 +742,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::calculate_pred_matrix(MolVect * 
 
 	for (cur_n = neighbors->begin(); cur_n != neighbors->end(); cur_n++) {
 		i++;
-		if (((unsigned) INTEGER(svR)[j] == i) && (j < ((unsigned) INTEGER(lR)[0]))) { 
+		if (((unsigned) INTEGER(svR)[j] == i) && (j < ((unsigned) INTEGER(lR)[0]))) {
 			j++;
 			gsl_matrix_set(pred_matrix,0,j-1,gauss((*cur_n)->get_similarity()));
 		}
@@ -856,7 +856,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::print_neighbor(string act) {
 
 template <typename MolType, typename FeatureType, typename ActivityType>
 void FeatMol<MolType,FeatureType,ActivityType>::print_unknown(string act) {
-	
+
 	// print infrequent features
 	/*
 	if (infrequent_features.size()>0) {
@@ -881,7 +881,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::print_unknown(string act) {
 					reverse(rev_str2.begin(),rev_str2.end());
 					if ((cur_str1->find(*cur_str2) != string::npos) || (cur_str1->find(rev_str2) != string::npos)) {
 						general = false;
-						break;	   
+						break;
 					}
 				}
 			}
@@ -898,7 +898,7 @@ template <typename MolType, typename FeatureType, typename ActivityType>
 void FeatMol<MolType,FeatureType,ActivityType>::print_features(string act) {
 
 	if (features.size()>0) {
-		
+
 		bool redundant;
 		FeatVect nonred;
 		vector<int> * f1_matches;
@@ -925,7 +925,7 @@ void FeatMol<MolType,FeatureType,ActivityType>::print_features(string act) {
 						f2_matches->begin(), f2_matches->end(),
 						insert_iterator<vector<int> >(common_matches,common_matches.begin()));
 
-				if (common_matches == *f1_matches | common_matches == *f2_matches) {
+				if ((common_matches == *f1_matches) | (common_matches == *f2_matches)) {
 					redundant = true;
 					break;
 				}
@@ -1013,10 +1013,10 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 		uv = this->pred_features;
 		iv = this->common_feat;
 	}
-	
+
 	// set significances in union feature set
 	for (cur_feat = uv.begin(); cur_feat != uv.end(); cur_feat++) {
-		(*cur_feat)->set_cur_p(act); 	
+		(*cur_feat)->set_cur_p(act);
 	}
 
 	// determine u = sum of significances of union feature set
@@ -1038,7 +1038,7 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 				suni.begin(),suni.end(),
 				insert_iterator<FeatVect >(sinter,sinter.begin()),
 				greater_p<FeatureType>());
-	
+
 		// determine c = sum of significances of common feature set
 		for (cur_feat = sinter.begin(); cur_feat != sinter.end(); cur_feat++) {
 		    p = (*cur_feat)->get_cur_p();
@@ -1056,7 +1056,7 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 
 	// for similarity to test structure, additionally punish unknown fragments
 	if (m1 == this) {
-		float known_fraction = float(features.size()) / float(features.size() + unknown_features.size()); 
+		float known_fraction = float(features.size()) / float(features.size() + unknown_features.size());
 		tanimoto = known_fraction * tanimoto;
 	}
 
@@ -1070,12 +1070,12 @@ template <typename MolType, typename FeatureType, typename ActivityType>
 void FeatMol<MolType,FeatureType,ActivityType>::relevant_features(MolRef test, string act) {
 
 	similarity = get_similarity(this, test, act);
-	
+
 };
-		
+
 template <typename MolType, typename FeatureType, typename ActivityType>
 float FeatMol<MolType,FeatureType,ActivityType>::get_similarity() {
-	
+
 	if (similarity > 0)
 		return(similarity);
 	else
@@ -1088,7 +1088,7 @@ bool FeatMol<MolType,FeatureType,ActivityType>::equal(const MolRef mol) {
 
 	if (this->get_inchi() != "" && mol->get_inchi() != "")
 			return(this->get_inchi() == mol->get_inchi());
-	else				
+	else
 		return(this->get_smiles() == mol->get_smiles()); // just an attempt to guess identity in the case, that unique smiles have been provided
 
 }
@@ -1133,7 +1133,7 @@ bool FeatMol<MolType,FeatureType,ActivityType>::matches(Feature<FeatureType> * f
 /*
 template <typename MolType, typename FeatureType, typename ActivityType>
 vector<Feature<FeatureType> *> FeatMol<MolType,FeatureType,ActivityType>::get_sig_features() {
-	
+
 	typedef vector<Feature<FeatureType> *> FeatVect;
 	FeatVect sig_features;
 	typename FeatVect::iterator cur_feat;

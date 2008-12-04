@@ -2,7 +2,7 @@
 
 void init_R(int argc, char **argv) {
 	int defaultArgc = 1;
-	char *defaultArgv[] = {"Rtest"};
+	char *defaultArgv[] = {(char*)"Rtest"};
 
 	if(argc == 0 || argv == NULL) {
 		argc = defaultArgc;
@@ -94,7 +94,7 @@ void print_vector(gsl_vector* v) {
 }
 
 void matrix_gsl2R(SEXP* mr, gsl_matrix* m) {
-	
+
         PROTECT((*mr) = allocMatrix(REALSXP, m->size1, m->size2));
         for(unsigned int i = 0; i < m->size1; i++) {
                 for(unsigned int j = 0; j < m->size2; j++) {
@@ -195,8 +195,8 @@ void get_mean(gsl_matrix* m, gsl_vector* mean) {
 	// calculate mean
 	SEXP meanr;
 	//printf("Centroid: \n");
-	PROTECT(meanr = R_exec("colMeans",mr)); for(unsigned int i = 0; i < mean->size; i++) { gsl_vector_set(mean, i, REAL(meanr)[i]); //printf("%f ", REAL(meanr)[i]); 
-						} ; 
+	PROTECT(meanr = R_exec("colMeans",mr)); for(unsigned int i = 0; i < mean->size; i++) { gsl_vector_set(mean, i, REAL(meanr)[i]); //printf("%f ", REAL(meanr)[i]);
+						} ;
 	//printf("\n");
 	fflush(stdout);
 	UNPROTECT(2);
@@ -210,10 +210,10 @@ float mahal(gsl_vector* x, gsl_matrix* m, gsl_matrix* covm) {
 	gsl_vector* mean = gsl_vector_calloc(m->size2);
 
 	// calculate mean vector
-	get_mean(m,mean);	
-	
+	get_mean(m,mean);
+
 	float d = 0.0;
-	
+
 	// cov can be used
 	if (m->size2 > 1) {
 
@@ -225,7 +225,7 @@ float mahal(gsl_vector* x, gsl_matrix* m, gsl_matrix* covm) {
 
 		// set x vector
 		PROTECT(xr = allocVector(REALSXP, x->size)); for (unsigned int i=0; i<x->size; i++) REAL(xr)[i] = gsl_vector_get(x,i);
-		// set mean vector 
+		// set mean vector
 		PROTECT(meanr = allocVector(REALSXP, mean->size)); for (unsigned int i=0; i<x->size; i++) REAL(meanr)[i] = gsl_vector_get(mean,i);
 		// set cov matrix
 		PROTECT(covmr = allocMatrix(REALSXP, covm->size1, covm->size2));
@@ -243,7 +243,7 @@ float mahal(gsl_vector* x, gsl_matrix* m, gsl_matrix* covm) {
 		UNPROTECT(4);
 		//gsl_matrix_free(covm);
 	}
-	
+
 	// cov can not be used -- use euclidean distance for 1-D
 	else {
 		d = fabs(gsl_vector_get(x,0) - gsl_vector_get(mean,0));
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
 
 
 
-gsl_matrix* pca_cols(gsl_matrix* feature_matrix, gsl_vector* means, unsigned int no_c) {   
+gsl_matrix* pca_cols(gsl_matrix* feature_matrix, gsl_vector* means, unsigned int no_c) {
 
 	// subtract means of columns
 	for (unsigned int j = 0; j < feature_matrix->size2; j++) {
@@ -321,21 +321,21 @@ gsl_matrix* pca_cols(gsl_matrix* feature_matrix, gsl_vector* means, unsigned int
 
 	// get proportion of variance
 	SEXP ev;
-	PROTECT(ev = get_list_element(pca,"sdev"));						//R_exec("print",ev);
+	PROTECT(ev = get_list_element(pca,(char*)"sdev"));						//R_exec("print",ev);
 	unsigned int dim = length(ev);								//fprintf(stderr, "dim: %i\n", dim);
 
 	float sum_var = 0.0; float c_ev = 0.0;
-	for (unsigned int i = 0; i < dim; i++) { 
+	for (unsigned int i = 0; i < dim; i++) {
 		c_ev = (REAL(ev)[i]) * (REAL(ev)[i]);
 		sum_var += c_ev;
 	}
 
-	// using all eigenvectors?	
+	// using all eigenvectors?
 	bool using_all = false;
 	if (dim <= no_c) { no_c = dim; using_all = true; }
 
 	float cum_var = 0.0; c_ev = 0.0;
-	for (unsigned int i = 0; i < no_c; i++) { 
+	for (unsigned int i = 0; i < no_c; i++) {
 		c_ev = (REAL(ev)[i]) * (REAL(ev)[i]);
 		cum_var += c_ev;
 	}
@@ -344,7 +344,7 @@ gsl_matrix* pca_cols(gsl_matrix* feature_matrix, gsl_vector* means, unsigned int
 
 	// get loads (eigenvectors)
 	SEXP loads;
-	PROTECT(loads = get_list_element(pca, "rotation"));					//R_exec("print", loads);
+	PROTECT(loads = get_list_element(pca, (char*)"rotation"));					//R_exec("print", loads);
 	gsl_matrix* rot = gsl_matrix_alloc(dim, no_c);
 	for(unsigned int i = 0; i < dim; i++) {
 		for(unsigned int j = 0; j < no_c; j++) {
@@ -359,7 +359,7 @@ gsl_matrix* pca_cols(gsl_matrix* feature_matrix, gsl_vector* means, unsigned int
 }
 
 
-gsl_matrix* pca(gsl_matrix* feature_matrix, gsl_vector* means, float sig_limit) {   
+gsl_matrix* pca(gsl_matrix* feature_matrix, gsl_vector* means, float sig_limit) {
 
 	// subtract means of columns
 	for (unsigned int j = 0; j < feature_matrix->size2; j++) {
@@ -390,11 +390,11 @@ gsl_matrix* pca(gsl_matrix* feature_matrix, gsl_vector* means, float sig_limit) 
 
 	// get proportion of variance
 	SEXP ev;
-	PROTECT(ev = get_list_element(pca,"sdev"));						//R_exec("print",ev);
+	PROTECT(ev = get_list_element(pca,(char*)"sdev"));						//R_exec("print",ev);
 	unsigned int dim = length(ev);									//printf("dim: %i\n", dim);
 
 	float sum_var = 0.0; float c_ev = 0.0;
-	for (unsigned int i = 0; i < dim; i++) { 
+	for (unsigned int i = 0; i < dim; i++) {
 		c_ev = (REAL(ev)[i]) * (REAL(ev)[i]);
 		sum_var += c_ev;
 	}
@@ -404,14 +404,14 @@ gsl_matrix* pca(gsl_matrix* feature_matrix, gsl_vector* means, float sig_limit) 
 		c_ev = (REAL(ev)[i]) * (REAL(ev)[i]);
 		cum_var += c_ev;							 	//printf("ev%i: %.7g\n", i, REAL(ev)[i]);
 		sig_cnt++;
-		if ((cum_var/sum_var) > sig_limit) break; 
+		if ((cum_var/sum_var) > sig_limit) break;
 	}
 
 	//fprintf(stderr, "Cumulative variance of %g reached by using %i eigen vector(s).\n" , (cum_var/sum_var), sig_cnt);
 
 	// get loads (eigenvectors)
 	SEXP loads;
-	PROTECT(loads = get_list_element(pca, "rotation"));					//R_exec("print", loads);
+	PROTECT(loads = get_list_element(pca, (char*)"rotation"));					//R_exec("print", loads);
 	gsl_matrix* rot = gsl_matrix_alloc(dim, sig_cnt);
 	for(unsigned int i = 0; i < dim; i++) {
 		for(unsigned int j = 0; j < sig_cnt; j++) {
@@ -440,8 +440,8 @@ gsl_matrix* transformData (gsl_matrix* data_c, gsl_matrix* rot, gsl_vector* mean
 	//fprintf(stderr, "rot_t: %ix%i, data_ct: %ix%i\n", rot_t->size1, rot_t->size2, data_ct->size1, data_ct->size2);
 	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, rot_t, data_ct, 0.0, t_data);
 
-	gsl_matrix_free(rot_t);	
-	gsl_matrix_free(data_ct);	
+	gsl_matrix_free(rot_t);
+	gsl_matrix_free(data_ct);
 	return(t_data);
 }
 
@@ -532,7 +532,7 @@ main() {
 
 	printMatrix(data);
 
-	
+
 	gsl_vector* means = gsl_vector_calloc(data->size2);
 
 	// DO PCA //

@@ -12,10 +12,10 @@ SERVER_OBJ = ServerSocket.o Socket.o
 OBJ += $(SERVER_OBJ)
 
 CC            = g++
-CXXFLAGS      = -g -O2 -I../../include/openbabel-2.0/ -I../../R/include/ -Wall
-LIBS	      = -lm -ldl -lopenbabel -lgsl -lgslcblas -lR
-LDFLAGS       = -L../../lib -L../../R/lib
-RPATH         = -Wl,-rpath=../../R/lib:../../lib
+CXXFLAGS      = -g -O2 -I/usr/include/openbabel-2.0/ -I../R-2.8.0/include/ -I../gsl-1.9/bin/include/ -Wall
+LIBS	      = -lm -ldl -lopenbabel -lgslcblas -lgsl -lRblas -lRlapack -lR
+LDFLAGS       = -L../gsl-1.9/bin/lib -L../R-2.8.0/lib -L../R-2.8.0/bin/lib64/R/modules/
+RPATH         = -Wl,-rpath=../R-2.8.0/lib
 
 .PHONY:
 all: $(PROGRAM) $(FEAT_GEN) $(TOOLS)

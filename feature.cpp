@@ -1,6 +1,6 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
-   
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,7 @@
 
 #include "feature.h"
 #include "stats.h"
+#include <limits>
 
 extern float sig_thr;
 
@@ -35,6 +36,108 @@ void Feat::print(Out * out) {
 };
 
 // ClassFeat
+
+void ClassFeat::precompute_significance(string act, float n_a, float n_i, float f_a, float f_i) { // AM: determine significance
+
+	fa[act]=f_a;
+	fi[act]=f_i;
+	na[act]=n_a;
+	ni[act]=n_i;
+
+	//printf("\nall n_a %d  n_i %d  f_a %d  f_i %d\n",(int)n_a,(int)n_i,(int)f_a,(int)f_i);
+
+	cur_str_active = true;
+	cur_feat_occurs = true;
+	precompute_significance(act);
+
+	cur_str_active = true;
+	cur_feat_occurs = false;
+	precompute_significance(act);
+
+	cur_str_active = false;
+	cur_feat_occurs = true;
+	precompute_significance(act);
+
+	cur_str_active = false;
+	cur_feat_occurs = false;
+	precompute_significance(act);
+}
+
+void ClassFeat::set_cur_str_active(bool str_active){
+	cur_str_active = str_active;
+}
+
+void ClassFeat::set_cur_feat_occurs(bool feat_occurs){
+	cur_feat_occurs = feat_occurs;
+}
+
+string ClassFeat::get_map_key(string act)
+{
+	if(cur_str_active)
+		if(cur_feat_occurs)
+			return act+"_active_occurs";
+		else
+			return act+"_active";
+	else
+		if (cur_feat_occurs)
+			return act+"_occurs";
+		else
+			return act;
+}
+
+void ClassFeat::precompute_significance(string act) { // AM: determine significance
+
+	float n_a = get_na(act);
+	float n_i = get_ni(act);
+	float f_a = get_fa(act);
+	float f_i = get_fi(act);
+
+	float ea;
+	float ei;
+	float chisq;
+
+	// fragments with total frequency of 1 are not informative, but confounding
+	if (f_a>=0 && f_i>=0 && (f_a+f_i)>1) {
+
+		ea = n_a*(f_a+f_i)/(n_a+n_i); // expected actives
+		ei = n_i*(f_a+f_i)/(n_a+n_i);  // expected inactives
+
+		// calculate chi square with Yate's correction
+		// i.e. reduce observed frequencies by 0.5
+		chisq = (f_a-ea-0.5)*(f_a-ea-0.5)/ea + (f_i-ei-0.5)*(f_i-ei-0.5)/ei;
+
+	}
+	else
+		chisq = 0;
+
+	significance[get_map_key(act)]=chisq;
+    p[get_map_key(act)]=calc_p(act);
+	float cur_chisq = 0;
+	float cur_ea;
+	float cur_ei;
+	int i;
+
+	if (n_a > n_i) {	// exchange na and ni
+		float tmp  = n_a;
+		n_a = n_i;
+		n_i = tmp;
+	}
+	// find minimum frequency for statistical significance
+	for (i=1; cur_chisq < 3.84; i++) {
+		cur_ea = n_a*i/(n_a+n_i);
+		cur_ei = n_i*i/(n_a+n_i);
+		cur_chisq = (i-cur_ea-0.5)*(i-cur_ea-0.5)/cur_ea + (cur_ei+0.5)*(cur_ei+0.5)/cur_ei ;
+	}
+	if (f_a<0 || f_i<0 || (f_a+f_i) < i)
+		too_infrequent[get_map_key(act)] = true;
+	else
+		too_infrequent[get_map_key(act)] = false;
+
+	//printf("mod: n_a %d  n_i %d  f_a %d  f_i %d   p %.2f  infreq %d\n",
+	//		(int)get_na(act),(int)get_ni(act),(int)f_a,(int)f_i,p[get_map_key(act)],(int)too_infrequent[get_map_key(act)]);
+
+};
+
 
 void ClassFeat::determine_significance(string act, float n_a, float n_i, vector<bool> * activities) { // AM: determine significance
 
@@ -93,7 +196,7 @@ void ClassFeat::determine_significance(string act, float n_a, float n_i, vector<
 		cur_ei = n_i*i/(n_a+n_i);
 		cur_chisq = (i-cur_ea-0.5)*(i-cur_ea-0.5)/cur_ea + (cur_ei+0.5)*(cur_ei+0.5)/cur_ei ;
 	}
-	if ((f_a+f_i) < i) 
+	if ((f_a+f_i) < i)
 		too_infrequent[act] = true;
 	else
 		too_infrequent[act] = false;
@@ -102,15 +205,19 @@ void ClassFeat::determine_significance(string act, float n_a, float n_i, vector<
 
 void ClassFeat::print(string act,Out * out) {
 
-	float p = this->p[act];
+	float na = get_na(act);
+	float ni = get_ni(act);
+	float fa = get_fa(act);
+	float fi = get_fi(act);
+
 	*out << "    - smarts: '" << this->get_name() << "'\n";
-	*out << "      p_chisq: '" << p << "'\n";
-	*out << "      chisq: '" << significance[act] << "'\n";
-	*out << "      fa: '" << fa[act]/na[act] << "'\n";
-	*out << "      fi: '" << fi[act]/ni[act] << "'\n";
+	*out << "      p_chisq: '" << get_p(act) << "'\n";
+	*out << "      chisq: '" << get_significance(act) << "'\n";
+	*out << "      fa: '" << fa/na << "'\n";
+	*out << "      fi: '" << fi/ni << "'\n";
 	*out << "      property: '";
 
-	if (fa[act]/(fa[act]+fi[act]) > na[act]/(na[act]+ni[act])) {
+	if (fa/(fa+fi) > na/(na+ni)) {
 		*out << "activating";
 	}
 	else {
@@ -120,33 +227,69 @@ void ClassFeat::print(string act,Out * out) {
 	out->print();
 };
 
-float ClassFeat::get_sig_limit() { return(3.84); }; 
+float ClassFeat::get_sig_limit() { return(3.84); };
 
-float ClassFeat::get_p_limit() { return(0.95); }; 
+float ClassFeat::get_p_limit() { return(0.95); };
 
-float ClassFeat::calc_p(string act) { return (gsl_cdf_chisq_P(significance[act], 1)); };
+float ClassFeat::calc_p(string act) {
 
-float ClassFeat::get_p(string act) { return (p[act]); };
+	return gsl_cdf_chisq_P(significance[get_map_key(act)], 1);
+};
 
-float ClassFeat::get_na(string act) { return(na[act]); };
+float ClassFeat::get_p(string act) {
 
-float ClassFeat::get_ni(string act) { return(ni[act]); };
+	return p[get_map_key(act)];
+};
 
-float ClassFeat::get_fa(string act) { return(fa[act]); };
+float ClassFeat::get_na(string act) {
 
-float ClassFeat::get_fi(string act) { return(fi[act]); };
+	if (cur_str_active)
+		return na[act]-1;
+	else
+		return na[act];
+};
+
+float ClassFeat::get_ni(string act) {
+
+	if (cur_str_active)
+		return ni[act];
+	else
+		return ni[act]-1;
+};
+
+float ClassFeat::get_fa(string act) {
+
+	if (cur_str_active && cur_feat_occurs)
+		return fa[act]-1;
+	else
+		return fa[act];
+};
+
+float ClassFeat::get_fi(string act) {
+
+	if (!cur_str_active && cur_feat_occurs)
+		return fi[act]-1;
+	else
+		return fi[act];
+};
 
 void ClassFeat::print_specifics(string act, Out* out) {
-		float p = this->p[act];
-		*out << this->get_name() << "\t" << p << "\t" << this->get_significance(act) << "\t" << (int) this->get_fa(act) << "\t" << (int) this->get_fi(act) << "\t" << (int) this->get_na(act) << "\t" << (int)this->get_ni(act) << "\t";
-		out->print();
 
-		if (this->get_fa(act)/(this->get_fa(act)+this->get_fi(act)) > this->get_na(act)/(this->get_na(act)+this->get_ni(act)))
-				*out << "a";
-		else
-				*out << "i";
+	float na = get_na(act);
+	float ni = get_ni(act);
+	float fa = get_fa(act);
+	float fi = get_fi(act);
 
-		out->print();
+	*out << this->get_name() << "\t" << get_p(act) << "\t" << get_significance(act)
+		<< "\t" << (int)fa << "\t" << (int)fi << "\t" << (int)na << "\t" << (int)ni << "\t";
+	out->print();
+
+	if (fa/(fa+fi) >na/(na+ni))
+			*out << "a";
+	else
+			*out << "i";
+
+	out->print();
 }
 
 
@@ -180,7 +323,7 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 				j2++;
 				fn2=j2/en2;
 			}
-			
+
 		}
 		else {
 			if (isnan(d1)) {
@@ -215,7 +358,7 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 		termbf=fabs(term);
 	}
     */
-	
+
 	// compute and compare medians to determine activation property
 	float aasum, aamedian, aamean, aavar, aadev, aaskew, aakurt;
 	computeStats(all_activities.begin(), all_activities.end(), aasum, aamedian, aamean, aavar, aadev, aaskew, aakurt);
@@ -230,12 +373,12 @@ void RegrFeat::determine_significance(string act, vector<float> all_activities, 
 
 
 void RegrFeat::determine_significance(string act, float global_med, vector<float> * activities) {
-	
+
 	// perform a simple sign test
 
 	vector<float> tmp;
 	vector<float>::iterator a;
-	
+
 	int f_l = 0;
 	int f_s = 0;
 	int n = 0;
@@ -255,7 +398,7 @@ void RegrFeat::determine_significance(string act, float global_med, vector<float
 			tmp.push_back(*a);
 		}
 	}
-	
+
 	int k = min(f_l,f_s);
 
 	// calculate cumulative distribution function
@@ -336,7 +479,7 @@ float RegrFeat::calc_p(string act) {
 		}
 		termbf=fabs(term);
 	}
-    return (p); 
+    return (p);
 
 };
 
@@ -353,7 +496,7 @@ OBSmartsFrag::OBSmartsFrag(string smarts): Feat(smarts) {
 };
 
 //LinFrag
-  
+
 LinFrag::LinFrag(string smarts, bool split_bonds) {
 
 	fragment.clear();
@@ -421,7 +564,7 @@ void LinFrag::rev() {
 }
 
 string LinFrag::first_atom() {
-	return ( fragment[0] ); 
+	return ( fragment[0] );
 };
 
 string LinFrag::first_bond() {
@@ -454,7 +597,7 @@ bool LinFrag::more_specific(LinFrag * g) {
 	return(s_result != fragment.end());
 
 };
-	
+
 // rex generation
 
 string LinFrag::init_wildcard() {

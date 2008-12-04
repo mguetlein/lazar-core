@@ -1,6 +1,6 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
-   
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -64,27 +64,27 @@ int main(int argc, char *argv[], char *envp[]) {
   while ((c = getopt(argc, argv, "rkxhs:t:f:a:i:p:m:")) != -1) {
     switch(c) {
     case 's':
-      smi_file = optarg; 
+      smi_file = optarg;
       s_file = true;
       break;
     case 't':
-      train_file = optarg; 
+      train_file = optarg;
       t_file = true;
       break;
     case 'f':
-      feature_file = optarg; 
+      feature_file = optarg;
       f_file = true;
       break;
     case 'a':
-      alphabet_file = optarg; 
+      alphabet_file = optarg;
       a_file = true;
       break;
     case 'i':
-      input_file = optarg; 
+      input_file = optarg;
       i_file = true;
       break;
     case 'p':
-      port = atoi(optarg); 
+      port = atoi(optarg);
       daemon = true;
       break;
     case 'h':
@@ -121,13 +121,13 @@ int main(int argc, char *argv[], char *envp[]) {
     status = 1;
 
   // no input allowed for daemon
-  if (daemon & (loo | i_file | optind < argc))
+  if (daemon & (loo | i_file | (optind < argc)))
     status = 1;
 
   // smiles input required for command line predictions
   if (!daemon & !loo & !i_file & (optind == argc) )
     status = 1;
-    
+
   // print usage and examples for incorrect input
   if (status)  {
     cerr << "usage: " << argv[0] << " -s smiles_structures -t training_set -f feature_set [-r [-m significance_threshold]] [-k] [-a alphabet_file [\"smiles_string\"|-i test_set_file|-p port]|-x]\n";
@@ -143,10 +143,11 @@ int main(int argc, char *argv[], char *envp[]) {
 
   // initialize R
   cerr << "Initializing R environment...";
-  string r_home = "R_HOME=../../R";
-  putenv((char*) r_home.c_str());
 
-  char *R_argv[] = {"REmbeddedPostgres", "--gui=none", "--silent", "--no-save"};
+  //string r_home = "R_HOME=/home/martin/software/R-2.8.0";
+  //putenv((char*) r_home.c_str());
+
+  char *R_argv[] = { (char*)"REmbeddedPostgres", (char*)"--gui=none", (char*)"--silent", (char*)"--no-save"};
   int R_argc = sizeof(R_argv)/sizeof(R_argv[0]);
 
   init_R(R_argc, R_argv);
@@ -171,7 +172,7 @@ int main(int argc, char *argv[], char *envp[]) {
     }
 
     else {
-      
+
       if (!i_file) {        // read smiles from command line
         smiles = argv[optind];
         optind++;
@@ -202,7 +203,7 @@ int main(int argc, char *argv[], char *envp[]) {
   }
 
   else {                // read/write from socket
-    
+
     pid_t pid, sid;         // process ID and Session ID
 
     pid = fork();         // fork
@@ -215,9 +216,9 @@ int main(int argc, char *argv[], char *envp[]) {
 
     if (!quantitative) train_set_c = new Predictor<OBLazMol,ClassFeat,bool>(smi_file, train_file, feature_file, alphabet_file, out);
       else train_set_r = new Predictor<OBLazMol,RegrFeat,float>(smi_file, train_file, feature_file, alphabet_file, out);
-  
+
     string tmp;
-    signal(SIGTERM, shutdown); 
+    signal(SIGTERM, shutdown);
 
     try {                 // start daemon
 
@@ -229,7 +230,7 @@ int main(int argc, char *argv[], char *envp[]) {
         server.accept ( socket );   // wait for a client connection
         out = new SocketOut(&socket); // create a new output object
 
-        if (!quantitative) 
+        if (!quantitative)
           train_set_c->set_output(out);       // set new output
         else
           train_set_r->set_output(out);       // set new output
@@ -241,7 +242,7 @@ int main(int argc, char *argv[], char *envp[]) {
           while( true ) {
 
             socket >> tmp;            // read input line
-            istringstream iss(tmp);     
+            istringstream iss(tmp);
             smiles = "";
             getline(iss, smiles);
 
@@ -252,10 +253,10 @@ int main(int argc, char *argv[], char *envp[]) {
             }
 
             out->print();
-            
+
             if (!quantitative) train_set_c->predict_smi(smiles);    // predict
             else train_set_r->predict_smi(smiles);    // predict
-            
+
             server.remove ( socket ); // disconnect
           }
         }
@@ -270,7 +271,7 @@ int main(int argc, char *argv[], char *envp[]) {
       shutdown(0);
     }
   }
-  
+
   delete train_set_c;
   delete train_set_r;
   delete out;

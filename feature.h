@@ -1,4 +1,4 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,36 +65,56 @@ class ClassFeat: public Feat {
 		map<string, float> significance;
         map<string, float> p;
 		map<string, bool> too_infrequent;
+
 		float cur_sig;
 		float cur_p;
 
+		// MG : precompute significance
+		bool cur_str_active;
+		bool cur_feat_occurs;
+		void precompute_significance(string act);
+		string get_map_key(string act);
+		// MG
+
 	public:
-		
+
 		ClassFeat();
 		ClassFeat(string name): Feat(name) {};
-	
-		//! Determine feature significance using chi-sq test
-		void determine_significance(string act, float na, float ni, vector<bool> * activities); // AM: determine significance
 
-		void print_header(Out * out); 
+		//! Determine feature significance using chi-sq test
+		void determine_significance(string act, float n_a, float n_i, vector<bool> * activities); // AM: determine significance
+
+		// MG : precompute significance
+		void precompute_significance(string act, float n_a, float n_i, float f_a, float f_i);
+		void set_cur_str_active(bool str_active);
+		void set_cur_feat_occurs(bool feat_occurs);
+		// MG
+
+		void print_header(Out * out);
 		void print(string act,Out * out);
 		void print_specifics(string act, Out* out);
 
-		void set_cur_significance(string act) { cur_sig = significance[act]; };
-		void set_cur_p(string act) { cur_p = p[act]; };
+		void set_cur_significance(string act) {
+			cur_sig = significance[get_map_key(act)]; };
+		void set_cur_p(string act) {
+			cur_p = p[get_map_key(act)]; };
 
-		float get_significance(string act) { return (significance[act]); };
+		float get_significance(string act) {
+			return (significance[get_map_key(act)]); };
+
 		float get_cur_significance() { return (cur_sig); };
 		float get_cur_p() { return (cur_p); };
 		float get_sig_limit();
 		float get_p_limit();
-		float calc_p(string act);	
+		float calc_p(string act);
 		float get_p(string act);	//! returns the p value of the feature
 		float get_na(string act);
 		float get_ni(string act);
 		float get_fa(string act);
 		float get_fi(string act);
-		bool get_too_infrequent(string act) { return (too_infrequent[act]); };
+
+		bool get_too_infrequent(string act) {
+			return (too_infrequent[get_map_key(act)]); };
 };
 
 //! features for regression
@@ -114,7 +134,7 @@ class RegrFeat: public Feat {
 		map<string, bool> too_infrequent;
 
 	public:
-		
+
 		RegrFeat();
 		RegrFeat(string name): Feat(name)  {};
 
@@ -122,6 +142,17 @@ class RegrFeat: public Feat {
 		void determine_significance(string act, float median_all, vector<float> * activities);
 		void determine_significance(string act, vector<float> all_activities, vector<float> feat_activities);
 		void determine_significance_ks_e(string act, vector<float> all_activities, vector<float> feat_activities);
+
+		//MG:
+		void set_cur_str_active(bool str_active){
+			fprintf(stderr, "Not implemented for regression");
+			exit(1);
+		}
+		void set_cur_feat_occurs(bool feat_occurs){
+			fprintf(stderr, "Not implemented for regression");
+			exit(1);
+		}
+		//MG
 
 		void print_header(Out * out);
 		void print(string act,Out * out);
@@ -138,6 +169,7 @@ class RegrFeat: public Feat {
 		float get_median(string act);
 		float calc_p(string act);
 		float get_p(string act);	//! returns the p value of the feature
+
 		bool get_too_infrequent(string act) { return (too_infrequent[act]); };
 		void set_too_infrequent(string act) { too_infrequent[act] = true; };
 
@@ -164,14 +196,14 @@ class LinFrag {
 	private:
 
 		// a vector based representation of SMARTS, needed for refinement
-		vector<string> fragment;	
+		vector<string> fragment;
 
 	public:
 
 		LinFrag() {};
 		LinFrag(string smarts, bool split_bonds);
 		LinFrag(vector<string> fragment);
-		
+
 		vector<string> get_fragment();	//!< return the fragment in the vector representation
 		int size();
 
@@ -242,7 +274,7 @@ class Feature: public FeatureType {
 
 		void clear_matches() { matches.clear(); }
 
-	
+
 };
 
 template <class FeatureType>

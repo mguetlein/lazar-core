@@ -1,4 +1,4 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
 
     This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,11 @@ class ActMolVect: public FeatMolVect< MolType, FeatureType, ActivityType > {
 
 		vector<string> get_activity_names() { return(activity_names); }
 
+		// MG : precompute significance
+		void precompute_feature_significance(string act, vector<bool> activity_values);
+		void precompute_feature_significance(string act, vector<float> activity_values);
+		// MG
+
 		//! determine significance of boolean training set features using chi-sq test
 		void feature_significance(string act, vector<bool> activity_values);
 
@@ -88,16 +93,16 @@ ActMolVect<MolType, FeatureType, ActivityType>::ActMolVect(char* act_file,char* 
 	}
 
 	line_nr = 0;
-	
+
 	while (getline(input, line)) {
 
-		istringstream iss(line); 
+		istringstream iss(line);
 		int field_nr = 0;
-		
+
 		while(getline(iss, tmp_field, '\t')) {	// split at tabs
 
 			remove_dos_cr(&tmp_field);
-			
+
 			if (field_nr == 0) {		// ID
 
 				if (tmp_field == no_id)		// ignore compounds without structures
@@ -117,7 +122,7 @@ ActMolVect<MolType, FeatureType, ActivityType>::ActMolVect(char* act_file,char* 
 				activity_names.push_back(tmp_field);
 				act_name = tmp_field;
 			}
-			
+
 			else if (field_nr == 2) {	// ACTIVITY VALUES
 
 				if (tmp_field == "NA") {
@@ -129,7 +134,7 @@ ActMolVect<MolType, FeatureType, ActivityType>::ActMolVect(char* act_file,char* 
 					str  << tmp_field;
 					ActivityType act_value;
 					str >> act_value;
-					
+
 					if (quantitative) act_value = log10(act_value);
 					mol_ptr->set_activity(act_name,act_value);
 				}
@@ -163,13 +168,13 @@ ActMolVect<MolType, FeatureType, ActivityType>::ActMolVect(char* act_file,char* 
 
 template <class MolType, class FeatureType, class ActivityType>
 vector<ActivityType> ActMolVect<MolType, FeatureType, ActivityType>::get_activity_values(vector<int> comp_nrs, string act) {
-	
+
 	vector<ActivityType> activities;
 	vector<ActivityType> tmp;
 	vector<MolRef> compounds = this->get_compounds();
 	vector<int>::iterator cur_comp;
 	typename vector<ActivityType>::iterator cur_a;
-	
+
 	for (cur_comp=comp_nrs.begin();cur_comp!=comp_nrs.end();cur_comp++) {
 		if (compounds[*cur_comp]->is_available(act)) {
 			tmp = compounds[*cur_comp]->get_act(act);
@@ -213,15 +218,15 @@ void ActMolVect<MolType, FeatureType, ActivityType>::print_sig_features(float li
 	typename vector<Feature<FeatureType> * >::iterator cur_feat;
 	vector<FeatRef> printed_features;
 	vector<FeatRef> * features = this->get_features();;
-	
+
 	for (cur_act = activity_names.begin(); cur_act != activity_names.end(); cur_act++) {
 
 		activity_values = this->get_activity_values(*cur_act);
 		this->feature_significance(*cur_act, activity_values);
-		
+
 		for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
 
-			if ( (*cur_feat)->get_p(*cur_act) > limit ) { 
+			if ( (*cur_feat)->get_p(*cur_act) > limit ) {
 
 				if (find(printed_features.begin(),printed_features.end(),*cur_feat) == printed_features.end()) {
 					(*cur_feat)->print_matches(out, smarts);
@@ -256,6 +261,62 @@ void  ActMolVect<MolType, FeatureType, ActivityType>::print_sorted_features(floa
 };
 
 template <class MolType, class FeatureType, class ActivityType>
+void ActMolVect<MolType, FeatureType, ActivityType>::precompute_feature_significance(string act, vector<bool> activity_values) {
+
+	int n_a =0;
+	int n_i =0;
+	vector<bool>::iterator cur_act_val;
+	typename vector<FeatRef>::iterator cur_feat;
+	vector<FeatRef> * features = this->get_features();
+
+	// determine global nr of actives/inactives // AM: column sums
+	for (cur_act_val=activity_values.begin();cur_act_val!=activity_values.end();cur_act_val++) {
+
+		if (*cur_act_val)
+			n_a++;
+		else
+			n_i++;
+
+	}
+
+	//int count = 0;
+
+	// determine significance of training set features
+	for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
+
+		//if (count++ % 250 == 0)
+		//	printf("precomputing significance %d/%d\n",count,features->size());
+
+		if ((*cur_feat)->nr_matches() > 1) { // remove features that match on a single compound
+			activity_values = this->get_activity_values((*cur_feat)->get_matches(), act);
+
+			int f_a=0;
+			int f_i=0;
+			// AM: cell sums
+			for (cur_act_val = activity_values.begin(); cur_act_val != activity_values.end(); cur_act_val++) {
+
+				if (*cur_act_val)
+					f_a++;
+				else if (!*cur_act_val)
+					f_i++;
+
+			}
+
+			(*cur_feat)->precompute_significance(act, n_a, n_i, f_a, f_i);
+		}
+	}
+
+};
+
+template <class MolType, class FeatureType, class ActivityType>
+void ActMolVect<MolType, FeatureType, ActivityType>::precompute_feature_significance(string act, vector<float> activity_values){
+
+	fprintf(stderr, "Not implemented for regression");
+	exit(1);
+}
+
+
+template <class MolType, class FeatureType, class ActivityType>
 void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string act, vector<bool> activity_values) {
 
 	int n_a =0;
@@ -266,7 +327,7 @@ void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string
 
 	// determine global nr of actives/inactives // AM: column sums
 	for (cur_act_val=activity_values.begin();cur_act_val!=activity_values.end();cur_act_val++) {
-	
+
 		if (*cur_act_val)
 			n_a++;
 		else
@@ -298,7 +359,7 @@ void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string
 	for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
 		if ((*cur_feat)->nr_matches() > 1) { // remove features that match on a single compound
 			feat_activity_values = this->get_activity_values((*cur_feat)->get_matches(), act);
-			
+
 			/*
 			sort(feat_activity_values.begin(), feat_activity_values.end());
 			sort(all_activity_values.begin(), all_activity_values.end());
@@ -308,7 +369,7 @@ void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string
 			typename vector<float>::iterator cur_all_act;
 			cur_feat_act = feat_activity_values.begin();
 			cur_all_act = all_activity_values.begin();
-			
+
 
 			vector<float> missing_activity_values;						// place to store missing activities
 
@@ -316,12 +377,12 @@ void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string
 				if (cur_all_act == all_activity_values.end()) {
 					break;
 				}
-				
+
 				if ((*cur_feat_act) > (*cur_all_act)) {
 					missing_activity_values.push_back(*cur_all_act);	// current value doesn't appear in feature activity: store it
 					cur_all_act++;
 				}
-				
+
 				else if ((*cur_feat_act) < (*cur_all_act)) {
 					exit(1); //this shouldn't happen
 				}
@@ -331,11 +392,11 @@ void ActMolVect<MolType, FeatureType, ActivityType>::feature_significance(string
 				}
 			}
 			*/
-			
+
 			// run K-S test, sensitive version, but with ALL activity values
 			(*cur_feat)->determine_significance(act, all_activity_values, feat_activity_values);
 		}
-		
+
 		else {
 			(*cur_feat)->set_too_infrequent(act); // mark infrequent features
 		}

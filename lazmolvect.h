@@ -1,4 +1,4 @@
-/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de> 
+/* Copyright (C) 2005  Christoph Helma <helma@in-silico.de>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,10 +44,10 @@ class MolVect {
 	public:
 
 		MolVect() {};
-        
+
 		//! MolVect constructor: reads SMILES from file (called by FeatMolVect())
 		MolVect(char * structure_file, Out * out);
-		
+
 		//! add a new feature to compound comp_nr
 		void add_feature(int comp_nr, Feature<FeatureType> * feat_ptr) {
 			compounds[comp_nr]->add_feature(feat_ptr);
@@ -67,7 +67,7 @@ class MolVect {
 
 		//! Get Neighbors by using at least five compounds if any neighbors available
 		vector<MolRef> get_neighbors(string act);
- 
+
 		vector<MolRef> get_compounds() { return(compounds); };
 
 		MolRef get_compound(int n) { return(compounds[n]); };
@@ -108,20 +108,20 @@ MolVect<MolType, FeatureType, ActivityType>::MolVect(char * structure_file, Out 
 
 	*out << "Reading structures from " << structure_file << endl;
 	out->print_err();
-	
+
 	line_nr = 0;
 	int oldnr = 2;
-	
+
 	while (getline(input, line)) {
 
-		istringstream iss(line); 
+		istringstream iss(line);
 
 		int field_nr = 0;
-		
+
 		while(getline(iss, tmp_field, '\t')) {	// split at tabs
-			
+
 			if (field_nr == 0) {		// ID
-				
+
 				id = tmp_field;
 				dup_id = find(ids.begin(), ids.end(), id);
 
@@ -140,12 +140,12 @@ MolVect<MolType, FeatureType, ActivityType>::MolVect(char * structure_file, Out 
 			else if (field_nr == 1)	{ // SMILES
 				smi = tmp_field;
 				remove_dos_cr(&smi);
-					
+
 				mol_ptr = new FeatMol<MolType,FeatureType,ActivityType>(line_nr, id, smi,out);
 
 				inchi = mol_ptr->get_inchi();
 				dup_inchi = find(inchis.begin(), inchis.end(), inchi);
-				
+
 				if (dup_inchi == inchis.end())
 					inchis.push_back(inchi);
 
@@ -161,12 +161,12 @@ MolVect<MolType, FeatureType, ActivityType>::MolVect(char * structure_file, Out 
 
 			}
 
-							
+
 			oldnr = field_nr;
 			field_nr++;
 		}
 
-		compounds.push_back(mol_ptr);	
+		compounds.push_back(mol_ptr);
 		line_nr++;
 
 	}
@@ -234,7 +234,7 @@ vector<FeatMol < MolType, FeatureType, ActivityType > * >  MolVect<MolType, Feat
     }
     typename multimap<float,MolRef>::iterator cur_sn;
 
-    // cutoff 0.3 ~ (1/100)^(1/4), i.e. 100 compounds of similarity 0.3 are needed to compensate 1 compound of sim 
+    // cutoff 0.3 ~ (1/100)^(1/4), i.e. 100 compounds of similarity 0.3 are needed to compensate 1 compound of sim
     cur_sn = sim_sorted_neighbors.end();
     cur_sn--;
     while ((cur_sn != sim_sorted_neighbors.begin()) && (cur_sn->second->get_similarity()>0.3)) {
@@ -261,6 +261,7 @@ vector<FeatMol < MolType, FeatureType, ActivityType > * >  MolVect<MolType, Feat
 	return(neighbors);
 };
 
+
 template <class MolType, class FeatureType, class ActivityType>
 void MolVect<MolType, FeatureType, ActivityType>::determine_unknown(string act, MolRef test) {
 
@@ -284,7 +285,7 @@ void MolVect<MolType, FeatureType, ActivityType>::determine_unknown(string act, 
 						break;
 					}
 				}
-				
+
 				if ( !act_m || (*cur_feat)->get_too_infrequent(act) )
 					test->add_unknown((*cur_feat)->get_name());
 
@@ -294,7 +295,7 @@ void MolVect<MolType, FeatureType, ActivityType>::determine_unknown(string act, 
 
 template <class MolType, class FeatureType, class ActivityType>
 vector<string>  MolVect<MolType, FeatureType, ActivityType>::get_idfromsmi(string smi) {
-	
+
 	typename vector<MolRef>::iterator cur_mol;
 	vector<string> ids;
 
@@ -307,7 +308,7 @@ vector<string>  MolVect<MolType, FeatureType, ActivityType>::get_idfromsmi(strin
 
 template <class MolType, class FeatureType, class ActivityType>
 vector<string>  MolVect<MolType, FeatureType, ActivityType>::get_idfrominchi(string inchi) {
-	
+
 	typename vector<MolRef>::iterator cur_mol;
 	vector<string> ids;
 
@@ -320,7 +321,7 @@ vector<string>  MolVect<MolType, FeatureType, ActivityType>::get_idfrominchi(str
 
 template <class MolType, class FeatureType, class ActivityType>
 FeatMol < MolType, FeatureType, ActivityType > *  MolVect<MolType, FeatureType, ActivityType>::get_molfromid(string id) {
-	
+
 	typename vector<MolRef>::iterator cur_mol;
 
 	for (cur_mol=compounds.begin(); cur_mol!= compounds.end(); cur_mol++) {
