@@ -53,6 +53,8 @@ class Feat {
 		void print(Out * out);
 };
 
+
+
 //! features for classificatoutn
 class ClassFeat: public Feat {
 
@@ -70,7 +72,7 @@ class ClassFeat: public Feat {
 		float cur_p;
 
 		// MG : precompute significance
-		bool cur_str_active;
+		static bool cur_str_active;
 		bool cur_feat_occurs;
 		void precompute_significance(string act);
 		string get_map_key(string act);
@@ -78,15 +80,21 @@ class ClassFeat: public Feat {
 
 	public:
 
-		ClassFeat();
-		ClassFeat(string name): Feat(name) {};
+		ClassFeat(){
+			cur_feat_occurs = false;
+		};
+		ClassFeat(string name): Feat(name) {
+			cur_feat_occurs = false;
+		};
 
 		//! Determine feature significance using chi-sq test
 		void determine_significance(string act, float n_a, float n_i, vector<bool> * activities); // AM: determine significance
 
 		// MG : precompute significance
 		void precompute_significance(string act, float n_a, float n_i, float f_a, float f_i);
-		void set_cur_str_active(bool str_active);
+		static void set_cur_str_active(bool str_active){
+			cur_str_active = str_active;
+		};
 		void set_cur_feat_occurs(bool feat_occurs);
 		// MG
 
@@ -117,6 +125,8 @@ class ClassFeat: public Feat {
 			return (too_infrequent[get_map_key(act)]); };
 };
 
+
+
 //! features for regression
 class RegrFeat: public Feat {
 
@@ -144,10 +154,6 @@ class RegrFeat: public Feat {
 		void determine_significance_ks_e(string act, vector<float> all_activities, vector<float> feat_activities);
 
 		//MG:
-		void set_cur_str_active(bool str_active){
-			fprintf(stderr, "Not implemented for regression");
-			exit(1);
-		}
 		void set_cur_feat_occurs(bool feat_occurs){
 			fprintf(stderr, "Not implemented for regression");
 			exit(1);

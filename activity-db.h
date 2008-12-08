@@ -279,13 +279,8 @@ void ActMolVect<MolType, FeatureType, ActivityType>::precompute_feature_signific
 
 	}
 
-	//int count = 0;
-
 	// determine significance of training set features
 	for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++) {
-
-		//if (count++ % 250 == 0)
-		//	printf("precomputing significance %d/%d\n",count,features->size());
 
 		if ((*cur_feat)->nr_matches() > 1) { // remove features that match on a single compound
 			activity_values = this->get_activity_values((*cur_feat)->get_matches(), act);

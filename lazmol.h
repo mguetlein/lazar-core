@@ -217,6 +217,8 @@ class FeatMol: public MolType {
 
 		void common_features(MolRef test);
 
+		FeatVect get_common_features() { return(common_feat); };
+
 		void common_features(MolRef m1, MolRef m2, FeatVect* inter, FeatVect* uni);
 
 		void relevant_features(MolRef test, string act);

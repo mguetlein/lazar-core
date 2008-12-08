@@ -44,7 +44,10 @@ void ClassFeat::precompute_significance(string act, float n_a, float n_i, float 
 	na[act]=n_a;
 	ni[act]=n_i;
 
-	//printf("\nall n_a %d  n_i %d  f_a %d  f_i %d\n",(int)n_a,(int)n_i,(int)f_a,(int)f_i);
+	//pre-computing 4 significance values for all features for loo classification
+	//the right value for each feature depends on two criteria:
+	// - is the test structure active (reduces either n_a, or n_i)
+	// - does the feature occur in the test structure (if yes then reduce either f_a or f_i)
 
 	cur_str_active = true;
 	cur_feat_occurs = true;
@@ -63,9 +66,7 @@ void ClassFeat::precompute_significance(string act, float n_a, float n_i, float 
 	precompute_significance(act);
 }
 
-void ClassFeat::set_cur_str_active(bool str_active){
-	cur_str_active = str_active;
-}
+bool ClassFeat::cur_str_active = false;
 
 void ClassFeat::set_cur_feat_occurs(bool feat_occurs){
 	cur_feat_occurs = feat_occurs;
@@ -75,12 +76,12 @@ string ClassFeat::get_map_key(string act)
 {
 	if(cur_str_active)
 		if(cur_feat_occurs)
-			return act+"_active_occurs";
+			return act.append("_active_occurs");
 		else
-			return act+"_active";
+			return act.append("_active");
 	else
 		if (cur_feat_occurs)
-			return act+"_occurs";
+			return act.append("_occurs");
 		else
 			return act;
 }
@@ -132,10 +133,6 @@ void ClassFeat::precompute_significance(string act) { // AM: determine significa
 		too_infrequent[get_map_key(act)] = true;
 	else
 		too_infrequent[get_map_key(act)] = false;
-
-	//printf("mod: n_a %d  n_i %d  f_a %d  f_i %d   p %.2f  infreq %d\n",
-	//		(int)get_na(act),(int)get_ni(act),(int)f_a,(int)f_i,p[get_map_key(act)],(int)too_infrequent[get_map_key(act)]);
-
 };
 
 

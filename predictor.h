@@ -275,18 +275,17 @@ void Predictor<MolType, FeatureType, ActivityType>::loo_predict(bool yscr = fals
 	}
 
 	// MG : precompute
-	{
-		vector<ActivityType> activity_values;
-		vector<string> activity_names = train_structures->get_activity_names();
-		typename vector<string>::iterator cur_act;
+	vector<ActivityType> activity_values;
+	vector<string> activity_names = train_structures->get_activity_names();
+	typename vector<string>::iterator cur_act;
 
-		for (cur_act = activity_names.begin(); cur_act != activity_names.end(); cur_act++) {
+	for (cur_act = activity_names.begin(); cur_act != activity_names.end(); cur_act++) {
 
-			activity_values = train_structures->get_activity_values(*cur_act);
-			train_structures->precompute_feature_significance(*cur_act, activity_values);
+		activity_values = train_structures->get_activity_values(*cur_act);
+		train_structures->precompute_feature_significance(*cur_act, activity_values);
 
-		}
-	} // MG
+	}
+	// MG
 
 	for (int n = 0; n < train_structures->get_size(); n++) {
 
@@ -370,7 +369,6 @@ void Predictor<MolType, FeatureType, ActivityType>::predict(MolRef test, bool re
 	vector<string> activity_names = train_structures->get_activity_names();
 	typename vector<string>::iterator cur_act;
 
-
 	// determine common features in the training set
 	train_structures->common_features(test);
 
@@ -382,44 +380,26 @@ void Predictor<MolType, FeatureType, ActivityType>::predict(MolRef test, bool re
 			*out << "---\n";
 
 			if (recalculate) {
+				// MG: instead of calculate, select precomputed significance here
 				//activity_values = train_structures->get_activity_values(*cur_act);
 				//train_structures->feature_significance(*cur_act, activity_values);	// AM: feature significance
 
-				// MG: instead of calculate, select precomputed significance here
 				typename vector<FeatRef>::iterator cur_feat;
-				vector<FeatRef> * features = train_structures->get_features();
-				vector<int> matches;
-				vector<int>::iterator cur_comp;
 				vector<ActivityType> tmp_activities;
-				bool str_active;
 
 				tmp_activities = test->get_act(*cur_act);
 				if (tmp_activities.size() > 1) {
 					fprintf(stderr, "Current test structure has more than one activity value");
 					exit(1);
 				}
-				str_active = *tmp_activities.begin();
+				ClassFeat::set_cur_str_active( *tmp_activities.begin() );
 
-				for (cur_feat=features->begin(); cur_feat!=features->end(); cur_feat++){
-
-					//bool feat_occurs = test->matches(*cur_feat);
-//					printf("a:%d,o:%d\n",str_active,feat_occurs);
-
-					(*cur_feat)->set_cur_str_active( str_active );
-					(*cur_feat)->set_cur_feat_occurs( test->matches(*cur_feat) );
-
-//					bool match = false;
-//					matches = (*cur_feat)->get_matches();
-//					for (cur_comp=matches.begin();cur_comp!=matches.end();cur_comp++) {
-//						if (cur_comp == test.get_id()) {
-//							match = true;
-//							break;
-//						}
-//					}
-//					cur_feat->set_cur_feat_occurs(match);
+				// label features that occur in current test structure
+				vector<FeatRef> test_features = test->get_features();
+				for (cur_feat=test_features.begin(); cur_feat!=test_features.end(); cur_feat++){
+					(*cur_feat)->set_cur_feat_occurs( true );
 				}
 				// MG
-
 			}
 			else {
 				*out << "Significances for " << *cur_act << " not recalculated.\n";
@@ -431,6 +411,14 @@ void Predictor<MolType, FeatureType, ActivityType>::predict(MolRef test, bool re
             *out << "\n";
 			out->print();
 
+
+			// MG: remove label that feature occurs in current test structure
+			typename vector<FeatRef>::iterator cur_feat;
+			vector<FeatRef> test_features = test->get_features();
+			for (cur_feat=test_features.begin(); cur_feat!=test_features.end(); cur_feat++){
+				(*cur_feat)->set_cur_feat_occurs( false );
+			}
+			// MG
 		}
 
 		else cerr << "test db act not avail" << endl;
