@@ -82,17 +82,17 @@ class OBLazMol: public LazMol {
 
 	private:
 
-		OBMol mol;	// OBMol object
+//		OBMol mol;	// OBMol object
 		Out * out;
 
 	public:
 
 		OBLazMol(int nr, string id, string new_smiles, Out * out);
 
-		bool match(OBSmartsPattern * smarts_pattern);	//!< match a OBSmartsPattern
-		int match_freq(OBSmartsPattern * smarts_pattern);	//!< match a OBSmartsPattern and return the number of matches
-		OBMol * get_mol_ref();	//!< return the reference to the corresponding OBMol object
-		vector<string> sssr();	//!< identify the smallest set of smallest rings
+//		bool match(OBSmartsPattern * smarts_pattern);	//!< match a OBSmartsPattern
+//		int match_freq(OBSmartsPattern * smarts_pattern);	//!< match a OBSmartsPattern and return the number of matches
+//		OBMol * get_mol_ref();	//!< return the reference to the corresponding OBMol object
+//		vector<string> sssr();	//!< identify the smallest set of smallest rings
 		void set_output(Out * newout) { out = newout; };
 
 };

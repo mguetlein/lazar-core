@@ -21,6 +21,7 @@
 #include "feature-generation.h"
 #include "activity-db.h"
 #include "model.h"
+#include "time.h"
 
 using namespace std;
 using namespace OpenBabel;
@@ -147,7 +148,7 @@ void Predictor<MolType, FeatureType, ActivityType>::predict_ext() {
 			cur_mol = test_structures->get_compound(n);
 			delete feat_gen;
 			feat_gen = new FeatGen <MolType, FeatureType, ActivityType>(a_file, train_structures, cur_mol,out);
-			feat_gen->generate_linfrag(train_structures,cur_mol);
+//			feat_gen->generate_linfrag(train_structures,cur_mol);
 
 			*out << "Predicting external test id " << cur_mol->get_id() << endl;
 			out->print_err();
@@ -176,7 +177,7 @@ void Predictor<MolType, FeatureType, ActivityType>::predict_file() {
 			cur_mol = test_structures->get_compound(n);
 			delete feat_gen;
 			feat_gen = new FeatGen <MolType, FeatureType, ActivityType>(a_file, train_structures, cur_mol,out);
-			feat_gen->generate_linfrag(train_structures,cur_mol);
+//			feat_gen->generate_linfrag(train_structures,cur_mol);
 
 			//cur_mol->print();
 
@@ -274,6 +275,9 @@ void Predictor<MolType, FeatureType, ActivityType>::loo_predict(bool yscr = fals
 		}
 	}
 
+	clock_t t1 = clock();
+	cerr << "Precomputing siginficance values ... ";
+
 	// MG : precompute
 	vector<ActivityType> activity_values;
 	vector<string> activity_names = train_structures->get_activity_names();
@@ -286,6 +290,10 @@ void Predictor<MolType, FeatureType, ActivityType>::loo_predict(bool yscr = fals
 
 	}
 	// MG
+
+	clock_t t2 = clock();
+	cerr << "finished (" << (float)(t2-t1)/CLOCKS_PER_SEC << "sec)" << endl;
+
 
 	for (int n = 0; n < train_structures->get_size(); n++) {
 
@@ -337,7 +345,7 @@ void Predictor<MolType, FeatureType, ActivityType>::predict_smi(string smiles) {
 
 		delete feat_gen;
 		feat_gen = new FeatGen <MolType, FeatureType, ActivityType>(a_file, train_structures, cur_mol,out);
-		feat_gen->generate_linfrag(train_structures,cur_mol);
+//		feat_gen->generate_linfrag(train_structures,cur_mol);
 
 		if (duplicates.size() > 1) {
 			*out << int(duplicates.size()) << " instances of " << cur_mol->get_smiles() << " in the training set!\n";

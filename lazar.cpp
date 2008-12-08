@@ -141,6 +141,8 @@ int main(int argc, char *argv[], char *envp[]) {
 
   out = new ConsoleOut();       // write to STDOUT/STDERR
 
+  obErrorLog.StopLogging();
+
   // initialize R
   cerr << "Initializing R environment...";
 
