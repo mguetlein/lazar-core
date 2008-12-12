@@ -294,8 +294,9 @@ void Predictor<MolType, FeatureType, ActivityType>::loo_predict(bool yscr = fals
 	clock_t t2 = clock();
 	cerr << "finished (" << (float)(t2-t1)/CLOCKS_PER_SEC << "sec)" << endl;
 
-
 	for (int n = 0; n < train_structures->get_size(); n++) {
+
+		t1 = clock();
 
 		cur_mol = train_structures->get_compound(n);
 
@@ -325,6 +326,13 @@ void Predictor<MolType, FeatureType, ActivityType>::loo_predict(bool yscr = fals
 			}
 		}
 
+		t2 = clock();
+		static float avg_s = 0;
+		float s = (float)(t2-t1)/CLOCKS_PER_SEC;
+		avg_s = (avg_s * n + s) / float(n+1);
+
+		cerr << "Prediction " << n+1 << "/" << train_structures->get_size() << " of structure " <<cur_mol->get_id() <<
+		  " took " << s << " sec (avg is " << avg_s << " sec)" << endl;
 	}
 
 

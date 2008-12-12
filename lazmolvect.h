@@ -110,69 +110,68 @@ MolVect<MolType, FeatureType, ActivityType>::MolVect(char * structure_file, Out 
 	out->print_err();
 
 	line_nr = 0;
-	int oldnr = 2;
 
 	while (getline(input, line)) {
 
 		istringstream iss(line);
 
 		int field_nr = 0;
+		id = -1;
+		smi = "";
 
 		while(getline(iss, tmp_field, '\t')) {	// split at tabs
 
-			if (field_nr == 0) {		// ID
-
+			if (field_nr == 0)
 				id = tmp_field;
-				dup_id = find(ids.begin(), ids.end(), id);
-
-				if (dup_id == ids.end())
-					ids.push_back(id);
-
-				else {
-					*out << id << " (line " << line_nr << ") is not a unique ID ... exiting.\n";
-					out->print_err();
-					exit(1);
-				}
-
-
-			}
-
-			else if (field_nr == 1)	{ // SMILES
+			else if (field_nr == 1)
 				smi = tmp_field;
-				remove_dos_cr(&smi);
 
-				mol_ptr = new FeatMol<MolType,FeatureType,ActivityType>(line_nr, id, smi,out);
-
-				inchi = mol_ptr->get_inchi();
-				dup_inchi = find(inchis.begin(), inchis.end(), inchi);
-
-				if (dup_inchi == inchis.end())
-					inchis.push_back(inchi);
-
-				else {
-					dup_ids =  this->get_idfrominchi(inchi);
-					*out << "Compounds " << id ;
-					for (dup_id=dup_ids.begin();dup_id!=dup_ids.end();dup_id++) {
-						*out << " and " << *dup_id;
-					}
-					*out << " have identical structures.\n";
-					out->print_err();
-				}
-
-			}
-
-
-			oldnr = field_nr;
 			field_nr++;
+		}
+
+		// ID
+		dup_id = find(ids.begin(), ids.end(), id);
+
+		if (dup_id == ids.end())
+			ids.push_back(id);
+
+		else {
+			*out << id << " (line " << line_nr << ") is not a unique ID ... exiting.\n";
+			out->print_err();
+			exit(1);
+		}
+
+		// SMILES
+		remove_dos_cr(&smi);
+
+		mol_ptr = new FeatMol<MolType,FeatureType,ActivityType>(line_nr, id, smi,out);
+
+		inchi = mol_ptr->get_inchi();
+
+		// do not print duplicate warning for empty smiles
+		// (warning already printed in FeatMol constructor)
+		if (inchi.size()>0)
+		{
+			dup_inchi = find(inchis.begin(), inchis.end(), inchi);
+
+			if (dup_inchi == inchis.end())
+				inchis.push_back(inchi);
+			else {
+				dup_ids =  this->get_idfrominchi(inchi);
+				*out << "Compounds " << id ;
+				for (dup_id=dup_ids.begin();dup_id!=dup_ids.end();dup_id++) {
+					*out << " and " << *dup_id;
+				}
+				*out << " have identical structures.\n";
+				out->print_err();
+			}
 		}
 
 		compounds.push_back(mol_ptr);
 		line_nr++;
-
 	}
 
 	input.close();
-
 };
 
 
