@@ -429,6 +429,8 @@ void Predictor<MolType, FeatureType, ActivityType>::knn_predict(MolRef test, str
 	test->print_unknown(act);
 	out->print();
 
+	test->delete_unknown();
+
 };
 
 template <class MolType, class FeatureType, class ActivityType>
