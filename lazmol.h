@@ -1056,12 +1056,6 @@ float FeatMol<MolType,FeatureType,ActivityType>::get_similarity(MolRef m1, MolRe
 		}
 	}
 
-	// for similarity to test structure, additionally punish unknown fragments
-	if (m1 == this) {
-		float known_fraction = float(features.size()) / float(features.size() + unknown_features.size());
-		tanimoto = known_fraction * tanimoto;
-	}
-
 	return tanimoto;
 
 };
